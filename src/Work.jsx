@@ -33,8 +33,8 @@ const Work = () => {
         <div className="work-container">
             {/* HEADER - Top */}
             <header>
-                <div className="logo"><Link to="/" style={{ color: 'inherit', textDecoration: 'none' }}>KAKKHEAN</Link></div>
-                <div className="sub-header">Work</div>
+                <div className="work-logo">KAKKHEAN</div>
+                <div className="work-label">WORK</div>
             </header>
 
             {/* LIST - Middle (Grows to fill space) */}
@@ -54,17 +54,37 @@ const Work = () => {
             </ul>
 
             {/* FOOTER - Bottom */}
-            <div className="footer-container">
-                <div>
-                    5905 Wilshire Blvd, Los Angeles<br />
-                    Panorama Films
+            <div className="contact-footer">
+                <div className="footer-col">
+                    5905 WILSHIRE BLVD, LOS ANGELES, CA 90036<br />
+                    UNITED STATES OF AMERICA<br /><br />
+                    KAKKHEAN PORTFOLIO
                 </div>
-                <div>
-                    Twitter (X) / Instagram / LinkedIn
+                <div className="footer-col">
+                    TWITTER<br />
+                    INSTAGRAM<br />
+                    LINKEDIN
                 </div>
-                <div style={{ textAlign: 'right' }}>
+                <div className="footer-col">
                     HELLO@KAKKHEAN.COM<br />
-                    Crafted by Andre Lacerda
+                    +2 8733-2200<br /><br />
+                    SAY HELLO
+                </div>
+                <div className="footer-col">
+                    CRAFTED BY<br />
+                    ANDRE LACERDA<br /><br />
+                    FOLLOW ME
+                </div>
+            </div>
+
+            <div className="marquee-wrapper">
+                <div className="marquee-content">
+                    <span className="marquee-item">CRAFTED BY KAKKHEAN PORTFOLIO</span>
+                    <span className="marquee-item">CRAFTED BY KAKKHEAN PORTFOLIO</span>
+                    <span className="marquee-item">CRAFTED BY KAKKHEAN PORTFOLIO</span>
+                    <span className="marquee-item">CRAFTED BY KAKKHEAN PORTFOLIO</span>
+                    <span className="marquee-item">CRAFTED BY KAKKHEAN PORTFOLIO</span>
+                    <span className="marquee-item">CRAFTED BY KAKKHEAN PORTFOLIO</span>
                 </div>
             </div>
 
@@ -95,19 +115,21 @@ const Work = () => {
                                 const isActive = item === 'WORK';
                                 const isHovered = hoveredLink === item;
 
-                                let className = "menu-link";
-                                if (isActive) className += " active";
-                                if (hoveredLink && !isHovered) className += " dimmed";
+                                let wrapperClassName = "menu-link-wrapper";
+                                if (hoveredLink && !isHovered) wrapperClassName += " dimmed";
+
+                                let linkClassName = "menu-link";
+                                if (isActive) linkClassName += " active";
 
                                 const content = (
-                                    <div className="menu-link-wrapper">
+                                    <div className={wrapperClassName}>
                                         {isActive && (
                                             <svg className="active-border-svg" viewBox="0 0 100 60" preserveAspectRatio="none">
                                                 <path d={unequalRectPath} vectorEffect="non-scaling-stroke" />
                                             </svg>
                                         )}
                                         <motion.h2
-                                            className={className}
+                                            className={linkClassName}
                                             variants={itemVariants}
                                             onMouseEnter={() => setHoveredLink(item)}
                                             onMouseLeave={() => setHoveredLink(null)}

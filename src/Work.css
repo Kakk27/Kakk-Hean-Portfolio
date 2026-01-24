@@ -21,30 +21,27 @@
 
     /* Prevent horizontal scrollbar if width is 100vw */
     overflow-x: hidden;
+    position: relative;
 }
+
 
 /* --- HEADER --- */
-header {
-    padding: 40px 20px;
-    text-align: center;
-    flex-shrink: 0;
-    /* Prevents header from shrinking */
-}
-
-.logo {
-    font-size: 3rem;
-    /* Made slightly larger for desktop impact */
-    font-weight: 900;
+.work-logo {
+    font-family: 'Impact', sans-serif;
+    font-size: 2rem;
     letter-spacing: -2px;
-    margin-bottom: 5px;
     text-transform: uppercase;
+    margin-bottom: 20px;
+    transform: scaleY(0.8);
 }
 
-.sub-header {
-    font-size: 0.8rem;
+.work-label {
+    font-size: 0.7rem;
     color: #666;
-    text-transform: uppercase;
     letter-spacing: 2px;
+    margin-bottom: 50px;
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
 /* --- LIST STYLES (The middle section) --- */
@@ -146,16 +143,63 @@ header {
 }
 
 /* --- FOOTER --- */
-/* Add this class to your footer container in Work.jsx if you haven't yet */
-.footer-container {
-    display: flex;
-    justify-content: space-between;
-    padding: 40px 5vw;
-    font-size: 0.75rem;
-    color: #666;
+.contact-footer {
+    width: 90%;
+    margin: 50px auto 100px auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    font-size: 0.65rem;
+    color: #AAA;
     text-transform: uppercase;
+    line-height: 1.6;
+    font-weight: bold;
     flex-shrink: 0;
-    /* Prevents footer from squishing */
+}
+
+.footer-col {
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- MARQUEE (SCROLLING TEXT) --- */
+.marquee-wrapper {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    color: black;
+    padding: 8px 0;
+    overflow: hidden;
+    z-index: 10;
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
+}
+
+
+.marquee-content {
+    display: flex;
+    white-space: nowrap;
+    animation: scroll 20s linear infinite;
+    font-family: 'Brigends Expanded', 'Arial Black', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.marquee-item {
+    margin-right: 50px;
+}
+
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
 }
 
 /* --- RESPONSIVE MOBILE --- */
@@ -174,9 +218,19 @@ header {
         padding: 20px;
     }
 
-    .footer-container {
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
+    .contact-footer {
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 80px;
+    }
+
+    .marquee-wrapper {
+        bottom: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-footer {
+        grid-template-columns: 1fr;
     }
 }

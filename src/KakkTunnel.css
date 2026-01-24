@@ -179,6 +179,7 @@ strong,
   /* Space for the border to breathe */
   z-index: 1;
   /* Establishes stacking context */
+  transition: filter 0.3s ease, opacity 0.3s ease;
 }
 
 .menu-link {
@@ -190,7 +191,7 @@ strong,
   text-transform: uppercase;
   letter-spacing: -2px;
   transform: scaleY(0.9);
-  transition: color 0.3s ease, opacity 0.3s ease;
+  transition: color 0.3s ease;
 }
 
 .active-border-svg {
@@ -203,10 +204,11 @@ strong,
   /* Puts it BEHIND the text */
   pointer-events: none;
   fill: none;
-  stroke: rgb(255, 0, 0);
+  stroke: black;
   stroke-width: 3px;
   stroke-linecap: round;
   stroke-linejoin: round;
+  transition: filter 0.3s ease, opacity 0.3s ease, stroke 0.3s ease;
 }
 
 .menu-link.active {
@@ -217,9 +219,69 @@ strong,
   color: black !important;
 }
 
-.menu-link.dimmed {
-  color: #3a3a3a;
+/* Dimmed state for non-hovered items */
+.menu-link-wrapper.dimmed {
   filter: blur(6px);
-  /* <--- ADD THIS LINE */
-  opacity: 0.6;
+  opacity: 0.3;
+}
+
+.menu-link-wrapper.dimmed .active-border-svg {
+  filter: blur(4px);
+  stroke: #000000;
+}
+
+/* Subtle blur hover for the active border itself */
+.menu-link-wrapper:hover .active-border-svg {
+  filter: blur(2px);
+  opacity: 0.8;
+  transition: filter 0.2s ease, opacity 0.2s ease;
+}
+
+
+@media (max-width: 1024px) {
+  .main-title {
+    font-size: 6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-title {
+    font-size: 4rem;
+    letter-spacing: -2px;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    letter-spacing: 5px;
+  }
+
+  .menu-link {
+    font-size: 2.5rem;
+  }
+
+  .product-card {
+    width: 280px;
+    height: 180px;
+  }
+
+  .nav-btn {
+    bottom: 30px;
+    padding: 10px 30px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-title {
+    font-size: 2.5rem;
+  }
+
+  .menu-link {
+    font-size: 2rem;
+  }
+
+  .product-card {
+    width: 200px;
+    height: 130px;
+  }
 }

@@ -110,19 +110,21 @@ const Contact = () => {
                 const isActive = item === 'CONTACT';
                 const isHovered = hoveredLink === item;
 
-                let className = "menu-link";
-                if (isActive) className += " active";
-                if (hoveredLink && !isHovered) className += " dimmed";
+                let wrapperClassName = "menu-link-wrapper";
+                if (hoveredLink && !isHovered) wrapperClassName += " dimmed";
+
+                let linkClassName = "menu-link";
+                if (isActive) linkClassName += " active";
 
                 const content = (
-                  <div className="menu-link-wrapper">
+                  <div className={wrapperClassName}>
                     {isActive && (
                       <svg className="active-border-svg" viewBox="0 0 100 60" preserveAspectRatio="none">
                         <path d={unequalRectPath} vectorEffect="non-scaling-stroke" />
                       </svg>
                     )}
                     <motion.h2
-                      className={className}
+                      className={linkClassName}
                       variants={itemVariants}
                       onMouseEnter={() => setHoveredLink(item)}
                       onMouseLeave={() => setHoveredLink(null)}

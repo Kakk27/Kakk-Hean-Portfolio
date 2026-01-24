@@ -199,6 +199,16 @@
 }
 
 /* --- RESPONSIVE --- */
+@media (max-width: 1024px) {
+  .big-marquee-text {
+    font-size: 4rem;
+  }
+
+  .about-description {
+    max-width: 80%;
+  }
+}
+
 @media (max-width: 768px) {
   .big-marquee-text {
     font-size: 3rem;
@@ -211,6 +221,7 @@
 
   .about-description {
     padding: 0 20px;
+    font-size: 0.75rem;
   }
 
   .about-footer {
@@ -220,5 +231,23 @@
 
   .marquee-wrapper {
     bottom: 80px;
+  }
+
+  .about-logo {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .big-marquee-text {
+    font-size: 2rem;
+  }
+
+  .about-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-hero {
+    height: 250px;
   }
 }

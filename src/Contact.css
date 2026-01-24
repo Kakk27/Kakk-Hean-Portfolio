@@ -1,0 +1,170 @@
+/* src/Contact.css */
+.contact-page {
+  background-color: #000000;
+  color: white;
+  min-height: 96vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Arial', sans-serif;
+  padding-top: 40px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* --- HEADER --- */
+.contact-logo {
+  font-family: 'Brigends Expanded', 'Impact', sans-serif;
+  font-size: 2rem;
+  letter-spacing: -2px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  transform: scaleY(0.8);
+}
+
+.contact-label {
+  font-size: 0.8rem;
+  color: #666;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+/* --- HERO TEXT --- */
+.contact-hero {
+  font-family: 'Brigends Expanded', 'Arial Black', sans-serif;
+  font-size: 3.5rem;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  text-align: center;
+  width: 90%;
+  letter-spacing: -2px;
+}
+
+/* --- FORM --- */
+.contact-form {
+  width: 90%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Gap between rows */
+  margin-bottom: 100px;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+  width: 100%;
+}
+
+/* Input Styles - Matches the Grey Boxes in Image */
+input, textarea {
+  background-color: #D9D9D9; 
+  border: none;
+  padding: 20px;
+  font-family: 'Arial', sans-serif;
+  font-size: 0.9rem;
+  color: #333;
+  text-transform: uppercase;
+  outline: none;
+  border-radius: 0; /* Sharp corners */
+  width: 100%;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #777;
+  letter-spacing: 1px;
+}
+
+.form-input {
+  flex: 1; /* 50% width */
+  height: 50px;
+}
+
+.form-textarea {
+  width: 860px;
+  height: 150px;
+  resize: none;
+}
+
+.submit-btn {
+  background-color: #333333;
+  color: white;
+  border: none;
+  width: 900px;
+  padding: 20px;
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-top: 5px;
+}
+
+.submit-btn:hover {
+  background-color: #555;
+}
+
+/* --- FOOTER COLUMNS --- */
+.contact-footer {
+  width: 90%;
+  max-width: 1200px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  font-size: 0.65rem;
+  color: #AAA;
+  margin-bottom: 100px; /* Space for marquee */
+  text-transform: uppercase;
+  line-height: 1.6;
+  font-weight: bold;
+}
+
+.footer-col h4 {
+  color: white;
+  margin-bottom: 5px;
+}
+
+/* --- MARQUEE (SCROLLING TEXT) --- */
+.marquee-wrapper {
+  position: fixed;
+  bottom: 10px; /* Positioned above the menu button */
+  left: 0;
+  width: 100%;
+  background-color: white;
+  color: black;
+  padding: 8px 0;
+  overflow: hidden;
+  z-index: 10;
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
+}
+
+.marquee-content {
+  display: flex;
+  white-space: nowrap;
+  animation: scroll 20s linear infinite;
+  font-family: 'Brigends Expanded', 'Arial Black', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.marquee-item {
+  margin-right: 50px;
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+  .contact-hero { font-size: 1.5rem; }
+  .form-row { flex-direction: column; }
+  .contact-footer { grid-template-columns: 1fr 1fr; gap: 30px; }
+  .marquee-wrapper { bottom: 80px; }
+}

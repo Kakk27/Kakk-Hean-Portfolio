@@ -1,0 +1,182 @@
+/* src/Work.css */
+
+/* 1. MAKE CONTAINER FULL SCREEN */
+.work-container {
+    background-color: #050505;
+    color: #ffffff;
+
+    /* Forces the container to take at least full viewport height */
+    min-height: 100vh;
+    width: 100vw;
+
+    /* Flexbox logic to space out Header, List, and Footer */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    /* Grid pattern background */
+    background-image: linear-gradient(#1a1a1a 1px, transparent 1px),
+        linear-gradient(90deg, #1a1a1a 1px, transparent 1px);
+    background-size: 40px 40px;
+
+    /* Prevent horizontal scrollbar if width is 100vw */
+    overflow-x: hidden;
+}
+
+/* --- HEADER --- */
+header {
+    padding: 40px 20px;
+    text-align: center;
+    flex-shrink: 0;
+    /* Prevents header from shrinking */
+}
+
+.logo {
+    font-size: 3rem;
+    /* Made slightly larger for desktop impact */
+    font-weight: 900;
+    letter-spacing: -2px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.sub-header {
+    font-size: 0.8rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* --- LIST STYLES (The middle section) --- */
+.work-list {
+    list-style: none;
+    width: 100%;
+    border-top: 1px solid #333;
+    padding: 0;
+    margin: 0;
+
+    /* Allows the list to grow and fill empty space if few items */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Opt: Centers items vertically if list is short */
+}
+
+.work-item {
+    position: relative;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.work-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3vh 5vw;
+    /* Responsive padding based on screen size */
+    text-decoration: none;
+    color: white;
+    position: relative;
+    z-index: 2;
+    transition: color 0.3s ease;
+}
+
+.project-name {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    /* Responsive font size */
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+}
+
+.client {
+    font-weight: 300;
+    font-family: monospace;
+    letter-spacing: -1px;
+}
+
+.title {
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.arrow {
+    font-size: 2.5rem;
+    font-weight: 300;
+    transition: transform 0.3s ease;
+}
+
+/* --- HOVER EFFECTS --- */
+.thumbnail {
+    position: absolute;
+    top: 50%;
+    right: 20%;
+    transform: translateY(-50%) scale(0.8);
+    width: 400px;
+    /* Larger image for desktop */
+    height: 250px;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    filter: grayscale(100%);
+    border: 1px solid #fff;
+}
+
+.work-item:hover {
+    background-color: #ffffff;
+}
+
+.work-item:hover .work-link {
+    color: #000000;
+}
+
+.work-item:hover .thumbnail {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+    filter: grayscale(0%);
+}
+
+.work-item:hover .arrow {
+    transform: rotate(45deg);
+}
+
+/* --- FOOTER --- */
+/* Add this class to your footer container in Work.jsx if you haven't yet */
+.footer-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 40px 5vw;
+    font-size: 0.75rem;
+    color: #666;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    /* Prevents footer from squishing */
+}
+
+/* --- RESPONSIVE MOBILE --- */
+@media (max-width: 768px) {
+    .thumbnail {
+        display: none;
+    }
+
+    .project-name {
+        flex-direction: column;
+        gap: 5px;
+        font-size: 1.5rem;
+    }
+
+    .work-link {
+        padding: 20px;
+    }
+
+    .footer-container {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+}

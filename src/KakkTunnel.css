@@ -1,0 +1,225 @@
+/* src/KakkTunnel.css */
+
+/* --- FONT IMPORTS --- */
+@font-face {
+  font-family: 'Brigends Expanded';
+  src: url('/fonts/Brigends Expanded.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Apply to all bold text */
+b,
+strong,
+.bold-text {
+  font-family: 'Brigends Expanded', 'Impact', 'Arial Black', sans-serif;
+  font-weight: normal;
+}
+
+/* --- LAYOUT & 3D SETUP --- */
+.scene-container {
+  height: 100vh;
+  width: 100vw;
+  background-color: #000000;
+  color: white;
+  perspective: 800px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Arial', sans-serif;
+}
+
+.motion-tunnel {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* --- GRID PLANES --- */
+.grid-plane {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: linear-gradient(rgba(255, 255, 255, 0.219) 2px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.219) 2px, transparent 1px);
+  background-size: 100px 100px;
+  opacity: 0.4;
+  pointer-events: none;
+  backface-visibility: visible;
+}
+
+.floor {
+  width: 300vw;
+  height: 3000px;
+  transform: translate(-50%, -50%) translateY(40vh) rotateX(90deg);
+}
+
+.ceiling {
+  width: 300vw;
+  height: 3000px;
+  transform: translate(-50%, -50%) translateY(-40vh) rotateX(90deg);
+}
+
+.left {
+  width: 3000px;
+  height: 300vh;
+  transform: translate(-50%, -50%) translateX(-60vw) rotateY(90deg);
+}
+
+.right {
+  width: 3000px;
+  height: 300vh;
+  transform: translate(-50%, -50%) translateX(60vw) rotateY(90deg);
+}
+
+/* --- BRANDING --- */
+.branding-layer {
+  transform: translateZ(-500px);
+  z-index: 50;
+  text-align: center;
+  pointer-events: none;
+}
+
+.main-title {
+  font-family: 'Brigends Expanded', 'Impact', 'Arial Black', sans-serif;
+  font-size: 10rem;
+  margin: 0;
+  line-height: 0.8;
+  letter-spacing: -5px;
+  text-transform: uppercase;
+  color: white;
+  transform: scaleY(0.8);
+}
+
+.subtitle {
+  display: block;
+  font-size: 1.2rem;
+  letter-spacing: 10px;
+  text-transform: uppercase;
+  margin-top: 25px;
+  font-weight: bold;
+}
+
+/* --- CARDS --- */
+.product-card {
+  position: absolute;
+  width: 400px;
+  height: 250px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 4px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 1);
+  outline: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* --- BUTTONS --- */
+.nav-btn {
+  position: fixed;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 40px;
+  border-radius: 30px;
+  border: none;
+  font-family: 'Arial Black', 'Arial', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  z-index: 200;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.nav-btn:hover {
+  transform: translateX(-50%) scale(1.05);
+}
+
+.menu-trigger {
+  background: white;
+  color: black;
+}
+
+.close-trigger {
+  background: black;
+  color: white;
+}
+
+/* --- MENU OVERLAY STYLES --- */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.menu-links-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.menu-link-wrapper {
+  position: relative;
+  display: inline-block;
+  padding: 5px 25px;
+  /* Space for the border to breathe */
+  z-index: 1;
+  /* Establishes stacking context */
+}
+
+.menu-link {
+  font-family: 'Brigends Expanded', 'Arial Black', sans-serif;
+  font-size: 4rem;
+  margin: 0;
+  color: black;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: -2px;
+  transform: scaleY(0.9);
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+.active-border-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  /* Puts it BEHIND the text */
+  pointer-events: none;
+  fill: none;
+  stroke: rgb(255, 0, 0);
+  stroke-width: 3px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.menu-link.active {
+  color: rgb(138, 138, 138);
+}
+
+.menu-link:hover {
+  color: black !important;
+}
+
+.menu-link.dimmed {
+  color: #3a3a3a;
+  filter: blur(6px);
+  /* <--- ADD THIS LINE */
+  opacity: 0.6;
+}

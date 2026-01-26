@@ -32,10 +32,8 @@ const Work = () => {
     return (
         <div className="work-container">
             {/* HEADER - Top */}
-            <header>
-                <div className="work-logo">KAKKHEAN</div>
-                <div className="work-label">WORK</div>
-            </header>
+            <div className="work-logo">KAKKHEAN</div>
+            <div className="work-label">WORK</div>
 
             {/* LIST - Middle (Grows to fill space) */}
             <ul className="work-list">

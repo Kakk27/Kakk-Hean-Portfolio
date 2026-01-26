@@ -25,9 +25,11 @@
 }
 
 .detail-header .logo {
+    font-family: 'Brigends Expanded', 'Impact', sans-serif;
+    letter-spacing: -2px;
+    text-transform: uppercase;
     font-size: 24px;
     font-weight: 700;
-    letter-spacing: 5px;
     cursor: pointer;
 }
 

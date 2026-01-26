@@ -110,7 +110,7 @@ const KakkTunnel = ({ images }) => {
         {cards.map((card) => (
           <motion.div
             key={card.id}
-            className="product-card"
+            className="product-card no-invert"
             style={{
               backgroundImage: `url(${card.img})`,
               transform: `translate(-50%, -50%) translate3d(${card.x}vw, ${card.y}vh, ${card.z}px) rotateX(${card.rotX}deg) rotateY(${card.rotY}deg)`,

@@ -12,7 +12,10 @@
     /* Flexbox logic to space out Header, List, and Footer */
     display: flex;
     flex-direction: column;
+    align-items: center;
+    /* Center header and items */
     justify-content: space-between;
+
 
     /* Grid pattern background */
     background-image: linear-gradient(#1a1a1a 1px, transparent 1px),
@@ -27,22 +30,24 @@
 
 /* --- HEADER --- */
 .work-logo {
-    font-family: 'Impact', sans-serif;
+    font-family: 'Brigends Expanded', 'Impact', sans-serif;
     font-size: 2rem;
     letter-spacing: -2px;
     text-transform: uppercase;
     margin-bottom: 20px;
     transform: scaleY(0.8);
+    margin-top: 40px;
 }
 
 .work-label {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     color: #666;
     letter-spacing: 2px;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
     text-transform: uppercase;
     font-weight: bold;
 }
+
 
 /* --- LIST STYLES (The middle section) --- */
 .work-list {

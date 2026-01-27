@@ -44,11 +44,11 @@ const ScrollParagraph = ({ value, isBold = false }) => {
   );
 };
 
-const About = () => {
+const About = ({ aboutData }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState(null);
 
-  const text1 = "OUR ESSENCE IS SHAPED BY AN UNUSUAL PERSPECTIVE, WHERE EACH PROJECT IS A CHALLENGE TO MOVE US BEYOND OUR COMFORT ZONE ALONGSIDE OUR CLIENTS.\n KAKKHEAN IS A CREATIVE STUDIO LOCATED IN AMSTERDAM THAT SERVES CLIENTS FROM ALL OVER THE WORLD. CRAFTING UNIQUE DIGITAL EXPERIENCES.";
+  const text1 = aboutData.bio;
 
   // Images for the sliding top gallery
   const galleryImages = [
@@ -118,8 +118,8 @@ const About = () => {
       {/* Footer Section */}
       <div className="about-footer">
         <div className="about-footer-col">
-          5905 WILSHIRE BLVD, LOS ANGELES, CA 90036<br />
-          UNITED STATES OF AMERICA<br /><br />
+          {aboutData.location.toUpperCase()}<br />
+          LOCAL STUDIO<br /><br />
           KAKKHEAN PORTFOLIO
         </div>
         <div className="about-footer-col">
@@ -128,8 +128,8 @@ const About = () => {
           LINKEDIN
         </div>
         <div className="about-footer-col">
-          HELLO@KAKKHEAN.COM<br />
-          +2 8733-2200<br /><br />
+          {aboutData.email.toUpperCase()}<br />
+          {aboutData.availability.toUpperCase()}<br /><br />
           SAY HELLO
         </div>
         <div className="about-footer-col">

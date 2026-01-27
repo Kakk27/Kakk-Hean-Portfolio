@@ -24,7 +24,7 @@ import {
   Menu
 } from 'lucide-react';
 
-const Dashboard = ({ images, setImages }) => {
+const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   const [activePage, setActivePage] = useState('Home');
   const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedWork, setSelectedWork] = useState(null);
@@ -205,30 +205,88 @@ const Dashboard = ({ images, setImages }) => {
     </div>
   );
 
+  const handleAboutChange = (e) => {
+    setAboutData({ ...aboutData, [e.target.name]: e.target.value });
+  };
+
   const renderAbout = () => (
     <div className="space-y-12 animate-in fade-in duration-700 max-w-6xl mx-auto py-6 md:py-12">
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center text-center lg:text-left">
-        <div className="w-full lg:w-1/2 bg-zinc-950 dark:bg-zinc-900 rounded-[25px] h-[300px] md:h-[400px] flex items-center justify-center border border-zinc-800 shadow-2xl relative overflow-hidden">
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+        {/* Left Side: Preview Style Block */}
+        <div className="w-full lg:w-1/2 bg-zinc-950 dark:bg-zinc-900 rounded-[25px] h-[300px] md:h-[400px] flex items-center justify-center border border-zinc-800 shadow-2xl relative overflow-hidden shrink-0">
           <div className="text-center relative z-10 px-6">
-            <div className="text-5xl md:text-6xl font-bold mb-4 kakkhean-logo text-white tracking-tighter">KAKKHEAN</div>
-            <p className="text-zinc-500 font-mono tracking-widest text-[10px] md:text-xs italic uppercase">Cambodia / Local</p>
+            <div className="text-3xl md:text-4xl font-bold mb-4 kakkhean-logo text-white tracking-tighter uppercase">KAKKHEAN</div>
+            <p className="text-zinc-500 font-mono tracking-widest text-[10px] md:text-xs italic uppercase">{aboutData.location} / Local</p>
           </div>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,_rgba(255,255,255,0.05),_transparent)]"></div>
         </div>
-        <div className="w-full lg:w-1/2 space-y-6 md:space-y-8">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold dark:text-white tracking-tighter leading-none uppercase">About <br className="hidden lg:block" /> The Studio</h1>
-          <p className="text-base md:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed">
-            With over 5 years of experience in digital design and engineering, I help businesses bring their
-            vision to life through minimal design and efficient engineering. Our methodology focuses on clean typography, open space, and perfect motion.
-          </p>
-          <div className="grid grid-cols-2 gap-4 md:gap-8 pt-8 border-t dark:border-zinc-800">
-            <div>
-              <div className="text-xl md:text-2xl font-bold dark:text-white">Cambodia</div>
-              <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-2">Location</div>
+
+        {/* Right Side: Editable Form */}
+        <div className="w-full lg:w-1/2 space-y-6">
+          <div className="space-y-4">
+            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block ml-1">Studio Heading</label>
+            <input
+              type="text"
+              name="title"
+              value={aboutData.title}
+              onChange={handleAboutChange}
+              className="w-full bg-zinc-100 dark:bg-zinc-800/50 dark:text-white text-2xl font-bold tracking-tighter p-4 rounded-xl border-none outline-none focus:ring-2 ring-blue-500/20 transition-all font-sans uppercase"
+            />
+          </div>
+
+          <div className="space-y-4">
+            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block ml-1">Bio / Agency Description</label>
+            <textarea
+              name="bio"
+              value={aboutData.bio}
+              onChange={handleAboutChange}
+              rows={6}
+              className="w-full bg-zinc-100 dark:bg-zinc-800/50 dark:text-white text-sm leading-relaxed p-4 rounded-xl border-none outline-none focus:ring-2 ring-blue-500/20 transition-all resize-none"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 pb-2">
+            <button className="h-24 bg-zinc-50 dark:bg-zinc-800/30 border-2 border-dashed border-zinc-200 dark:border-zinc-700 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all group">
+              <div className="w-8 h-8 rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                <Plus size={14} className="text-zinc-400 group-hover:text-black dark:group-hover:text-white" />
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300">Add Main Image</span>
+            </button>
+            <button className="h-24 bg-zinc-50 dark:bg-zinc-800/30 border-2 border-dashed border-zinc-200 dark:border-zinc-700 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all group">
+              <div className="w-8 h-8 rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                <Layout size={14} className="text-zinc-400 group-hover:text-black dark:group-hover:text-white" />
+              </div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300">Add Image Slider</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 md:gap-8 pt-6 border-t dark:border-zinc-800">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block ml-1">Location</label>
+              <input
+                type="text"
+                name="location"
+                value={aboutData.location}
+                onChange={handleAboutChange}
+                className="w-full bg-zinc-100 dark:bg-zinc-800/50 dark:text-white text-xl font-bold p-3 rounded-xl border-none outline-none focus:ring-2 ring-blue-500/20 transition-all"
+              />
             </div>
-            <div>
-              <div className="text-xl md:text-2xl font-bold dark:text-white">Active.24</div>
-              <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-2">Availability</div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block ml-1">Availability</label>
+              <input
+                type="text"
+                name="availability"
+                value={aboutData.availability}
+                onChange={handleAboutChange}
+                className="w-full bg-zinc-100 dark:bg-zinc-800/50 dark:text-white text-xl font-bold p-3 rounded-xl border-none outline-none focus:ring-2 ring-blue-500/20 transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="pt-4">
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-center gap-3">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Changes are automatically saved across the site</span>
             </div>
           </div>
         </div>

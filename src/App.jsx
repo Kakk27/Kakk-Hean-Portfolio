@@ -16,6 +16,14 @@ function App() {
     "https://picsum.photos/id/1047/600/400",
   ]);
 
+  const [aboutData, setAboutData] = useState({
+    title: "About The Studio",
+    bio: "With over 5 years of experience in digital design and engineering, I help businesses bring their vision to life through minimal design and efficient engineering. Our methodology focuses on clean typography, open space, and perfect motion.",
+    location: "Cambodia",
+    availability: "Active.24",
+    email: "hello@kakkhean.com"
+  });
+
   return (
     <Router>
       <div style={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
@@ -44,12 +52,17 @@ function App() {
 
           {/* Route 2: The Dashboard */}
           <Route path="/admin" element={
-            <Dashboard images={images} setImages={setImages} />
+            <Dashboard
+              images={images}
+              setImages={setImages}
+              aboutData={aboutData}
+              setAboutData={setAboutData}
+            />
           } />
 
           {/* ADD THIS ROUTE */}
           <Route path="/contact" element={<Contact />} />
-          <Route path="/about" element={<About />} />
+          <Route path="/about" element={<About aboutData={aboutData} />} />
           <Route path="/work" element={<Work />} />
           <Route path="/work/:projectId" element={<ProjectDetail />} />
         </Routes>

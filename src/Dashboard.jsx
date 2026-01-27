@@ -33,6 +33,10 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const imageInputRef = useRef(null);
 
+  useEffect(() => {
+    document.documentElement.classList.add('dark');
+  }, []);
+
   const navItems = [
     { label: 'Home', icon: Home },
     { label: 'About', icon: User },
@@ -47,7 +51,19 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
     { name: 'Instagram', icon: Instagram, url: 'https://instagram.com/yourusername' },
   ];
 
-  const workProjects = [
+  const [showAddProjectModal, setShowAddProjectModal] = useState(false);
+  const [newProject, setNewProject] = useState({
+    title: '',
+    topic: '',
+    description: '',
+    thumbnail: '',
+    images: [''],
+    client: '',
+    year: new Date().getFullYear().toString(),
+    service: '',
+  });
+
+  const [workProjects, setWorkProjects] = useState([
     {
       id: 1,
       title: 'E-Commerce Platform',
@@ -100,7 +116,63 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
       primaryImage: 'Homepage',
       secondaryImage: 'Interior Pages'
     },
-  ];
+  ]);
+
+  const handleAddProjectChange = (e) => {
+    const { name, value } = e.target;
+    setNewProject({ ...newProject, [name]: value });
+  };
+
+  const handleImageUpload = (e, isMain = true, index = 0) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (isMain) {
+          setNewProject(prev => ({ ...prev, thumbnail: reader.result }));
+        } else {
+          const updatedImages = [...newProject.images];
+          updatedImages[index] = reader.result;
+          setNewProject(prev => ({ ...prev, images: updatedImages }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const addProjectImageField = () => {
+    setNewProject({ ...newProject, images: [...newProject.images, ''] });
+  };
+
+  const removeProjectImageField = (index) => {
+    const updatedImages = newProject.images.filter((_, i) => i !== index);
+    setNewProject({ ...newProject, images: updatedImages });
+  };
+
+  const handleAddProjectSubmit = () => {
+    if (!newProject.title || !newProject.description) return;
+
+    const project = {
+      id: workProjects.length + 1,
+      title: newProject.title,
+      thumbnail: newProject.thumbnail || (workProjects.length + 1).toString().padStart(2, '0'),
+      category: newProject.service || 'Project',
+      client: newProject.client || 'Client Name',
+      year: newProject.year,
+      service: newProject.service,
+      topic: newProject.topic,
+      description: newProject.description,
+      primaryImage: 'Primary View',
+      secondaryImage: 'Detail View',
+      images: newProject.images // Store the array
+    };
+
+    setWorkProjects([project, ...workProjects]);
+    setShowAddProjectModal(false);
+    setNewProject({
+      title: '', topic: '', description: '', thumbnail: '', images: [''], client: '', year: new Date().getFullYear().toString(), service: ''
+    });
+  };
 
   const handleFormSubmit = () => {
     if (formData.name && formData.email && formData.message) {
@@ -297,17 +369,23 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   const renderWork = () => {
     if (selectedWork && activePage === 'Work') return renderWorkDetail();
     return (
-      <div className="space-y-8 md:space-y-12 animate-in fade-in duration-700 max-w-7xl mx-auto py-6 md:py-12">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold dark:text-white tracking-tighter leading-none uppercase">Works</h1>
-          <div className="text-zinc-400 font-mono mb-2 text-[10px] md:text-xs uppercase tracking-widest">/ Selected Projects</div>
+      <div className="space-y-2 md:space-y-3 animate-in fade-in duration-700 max-w-7xl mx-auto pb-1 md:pb-12">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-2">
+          <div className="flex items-center gap-6">
+            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold dark:text-white tracking-tighter leading-none uppercase">Works</h1>
+          </div>
+          <div className="text-zinc-400 font-mono text-[10px] md:text-xs uppercase tracking-widest">/ Selected Projects</div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
           {workProjects.map((project) => (
             <div key={project.id} onClick={() => setSelectedWork(project)} className="group cursor-pointer">
               <div className="aspect-[16/10] bg-zinc-50 dark:bg-zinc-900 rounded-[25px] overflow-hidden mb-6 border border-zinc-100 dark:border-zinc-800 shadow-sm relative">
                 <div className="absolute inset-0 flex items-center justify-center text-[6rem] md:text-[8rem] font-bold opacity-5 dark:opacity-20 transition-transform duration-700 group-hover:scale-110">
-                  {project.thumbnail}
+                  {project.thumbnail && (project.thumbnail.startsWith('http') || project.thumbnail.startsWith('data:')) ? (
+                    <img src={project.thumbnail} alt={project.title} className="w-full h-full object-cover opacity-50 grayscale group-hover:grayscale-0 transition-all duration-700" />
+                  ) : (
+                    project.thumbnail
+                  )}
                 </div>
                 <div className="absolute bottom-6 left-6 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all">
                   <div className="bg-white text-black px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shadow-2xl">
@@ -353,7 +431,7 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   );
 
   const renderContact = () => (
-    <div className="space-y-8 md:space-y-16 animate-in fade-in duration-700 max-w-7xl mx-auto py-4 md:py-6">
+    <div className="space-y-12 animate-in fade-in duration-700 max-w-6xl mx-auto py-6 md:py-12">
       <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold dark:text-white tracking-tighter leading-none uppercase">Contact</h1>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
         <div className="lg:col-span-7 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[25px] p-6 md:p-12 shadow-sm order-2 lg:order-1">
@@ -420,6 +498,110 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
               </a>
             ))}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderAddProjectModal = () => (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setShowAddProjectModal(false)}></div>
+      <div className="bg-white dark:bg-zinc-900 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[30px] shadow-2xl relative z-10 border border-zinc-200 dark:border-zinc-800 animate-in zoom-in duration-300">
+        <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 sticky top-0 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl z-20 flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold dark:text-white tracking-tighter uppercase">Add New Project</h2>
+            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Showcase your latest work</p>
+          </div>
+          <button onClick={() => setShowAddProjectModal(false)} className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded-xl text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="p-8 space-y-6">
+          {/* Main Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Topic Name</label>
+              <input type="text" name="topic" value={newProject.topic} onChange={handleAddProjectChange} className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs" placeholder="e.g. Modern E-Commerce" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Project Title</label>
+              <input type="text" name="title" value={newProject.title} onChange={handleAddProjectChange} className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs" placeholder="e.g. E-Commerce Platform" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Description</label>
+            <textarea name="description" value={newProject.description} onChange={handleAddProjectChange} rows={4} className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs resize-none leading-relaxed" placeholder="Brief description of the project..." />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Client Name</label>
+              <input type="text" name="client" value={newProject.client} onChange={handleAddProjectChange} className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs" placeholder="Client Name" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Year</label>
+              <input type="text" name="year" value={newProject.year} onChange={handleAddProjectChange} className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs" placeholder="2024" />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Service (Tag)</label>
+              <input type="text" name="service" value={newProject.service} onChange={handleAddProjectChange} className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs" placeholder="Web Dev" />
+            </div>
+          </div>
+
+          {/* Images Section */}
+          <div className="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+            <h3 className="text-xs font-bold uppercase tracking-widest">Images</h3>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Main Image / Thumbnail</label>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e, true)}
+                  className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 file:text-zinc-700 hover:file:bg-zinc-300"
+                />
+                {newProject.thumbnail && newProject.thumbnail.startsWith('data:') && (
+                  <img src={newProject.thumbnail} alt="Preview" className="mt-2 h-20 w-20 object-cover rounded-lg border border-zinc-200 dark:border-zinc-800" />
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Secondary Images</label>
+              {newProject.images.map((img, idx) => (
+                <div key={idx} className="space-y-2">
+                  <div className="flex gap-2 items-start">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleImageUpload(e, false, idx)}
+                      className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 file:text-zinc-700 hover:file:bg-zinc-300"
+                    />
+                    {newProject.images.length > 1 && (
+                      <button onClick={() => removeProjectImageField(idx)} className="p-3 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-colors">
+                        <X size={16} />
+                      </button>
+                    )}
+                  </div>
+                  {img && img.startsWith('data:') && (
+                    <img src={img} alt={`Preview ${idx}`} className="h-20 w-20 object-cover rounded-lg border border-zinc-200 dark:border-zinc-800" />
+                  )}
+                </div>
+              ))}
+              <button onClick={addProjectImageField} className="text-[10px] font-bold uppercase tracking-widest text-blue-500 hover:text-blue-600 flex items-center gap-1">
+                <Plus size={12} /> Add another image
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <div className="p-6 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 sticky bottom-0 z-20 flex justify-end gap-3">
+          <button onClick={() => setShowAddProjectModal(false)} className="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest text-zinc-500 hover:text-black dark:hover:text-white transition-colors">Cancel</button>
+          <button onClick={handleAddProjectSubmit} className="bg-black dark:bg-white text-white dark:text-black px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:scale-105 transition shadow-lg">Save Project</button>
         </div>
       </div>
     </div>
@@ -540,14 +722,16 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
               <Bell size={18} className="text-zinc-500 dark:text-zinc-400 group-hover:text-red-400" />
               <span className="absolute top-4 right-4 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-zinc-950"></span>
             </div>
-            <div className="w-12 h-12 bg-zinc-950 dark:bg-white rounded-2xl flex items-center justify-center shadow-2xl cursor-pointer hover:opacity-80 transition-all hover:scale-105 active:scale-95">
+            <div
+              onClick={() => setShowAddProjectModal(true)}
+              className="w-12 h-12 bg-zinc-950 dark:bg-white rounded-2xl flex items-center justify-center shadow-2xl cursor-pointer hover:opacity-80 transition-all hover:scale-105 active:scale-95">
               <Plus size={18} className="text-white dark:text-black" />
             </div>
           </div>
         </header>
 
         {/* DYNAMIC CONTENT */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-12 bg-white dark:bg-[#09090b] transition-colors duration-500 relative scroll-smooth">
+        <div className="flex-1 overflow-y-auto px-6 pb-6 pt-0 md:px-12 md:pb-12 md:pt-0 bg-white dark:bg-[#09090b] transition-colors duration-500 relative scroll-smooth">
           <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] dark:opacity-[0.05] pointer-events-none bg-[url('https://grain-y.com/wp-content/uploads/2021/04/grain.png')]"></div>
           <div className="relative z-10 h-full">
             {renderContent()}
@@ -561,6 +745,9 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
             onClick={() => setMobileMenuOpen(false)}
           ></div>
         )}
+
+        {/* ADD PROJECT MODAL OVERLAY */}
+        {showAddProjectModal && renderAddProjectModal()}
       </main>
     </div>
   );

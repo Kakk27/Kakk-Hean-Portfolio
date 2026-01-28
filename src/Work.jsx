@@ -5,6 +5,8 @@ import { projects } from './projectsData';
 import './Work.css';
 import './KakkTunnel.css';
 
+import { ArrowUpRight } from 'lucide-react';
+
 const Work = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [hoveredLink, setHoveredLink] = useState(null);
@@ -44,7 +46,7 @@ const Work = () => {
                                 <span className="client">{project.client}</span>
                                 <span className="title">{project.title}</span>
                             </span>
-                            <span className="arrow">↗</span>
+                            <span className="arrow"><ArrowUpRight size={40} strokeWidth={1.5} /></span>
                         </Link>
                         <img src={project.img} className="thumbnail" alt={`${project.client} project`} />
                     </li>

@@ -6,7 +6,6 @@ import {
   Mail,
   Plus,
   MoreHorizontal,
-  ChevronRight,
   Layout,
   Github,
   Linkedin,
@@ -14,19 +13,17 @@ import {
   Instagram,
   X,
   Send,
-  ExternalLink,
   ArrowRight,
   ArrowLeft,
-  Settings,
   Search,
   Bell,
   Globe,
   Menu
 } from 'lucide-react';
+import './Dashboard.css';
 
 const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   const [activePage, setActivePage] = useState('Home');
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [selectedWork, setSelectedWork] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -164,7 +161,7 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
       description: newProject.description,
       primaryImage: 'Primary View',
       secondaryImage: 'Detail View',
-      images: newProject.images // Store the array
+      images: newProject.images
     };
 
     setWorkProjects([project, ...workProjects]);
@@ -196,79 +193,76 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   };
 
   const renderHome = () => (
-    <div className="grid grid-cols-12 gap-6 lg:gap-8 animate-in fade-in duration-500">
+    <div className="grid-layout animate-fade-in">
       {/* Hero Welcome Card */}
-      <div className="col-span-12 lg:col-span-8">
-        <div className="bg-[#18181b] text-white p-8 md:p-12 rounded-[25px] relative overflow-hidden shadow-2xl h-full flex flex-col justify-center min-h-[300px]">
-          <div className="relative z-10">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 leading-tight tracking-tighter uppercase">
+      <div className="hero-card">
+        <div className="hero-content">
+          <div className="hero-text-wrap">
+            <h1 className="hero-title">
               Creative Designer <br /> & Developer
             </h1>
-            <p className="text-zinc-400 text-sm md:text-base mb-8 max-w-lg leading-relaxed">
+            <p className="hero-subtitle">
               Crafting beautiful digital experiences that make an impact for brands across the globe.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <button onClick={() => setActivePage('Work')} className="bg-white text-black px-6 py-2.5 rounded-xl font-bold text-sm hover:scale-105 transition shadow-lg">View Projects</button>
-              <button onClick={() => setActivePage('Contact')} className="bg-zinc-800 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-zinc-700 transition">Get In Touch</button>
+            <div className="hero-actions">
+              <button onClick={() => setActivePage('Work')} className="btn-primary">View Projects</button>
+              <button onClick={() => setActivePage('Contact')} className="btn-secondary">Get In Touch</button>
             </div>
           </div>
-          <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-zinc-700/20 rounded-full blur-[100px]"></div>
+          <div className="hero-glow"></div>
         </div>
       </div>
 
       {/* Gallery Management Card */}
-      <div className="col-span-12 lg:col-span-4 bg-white dark:bg-zinc-900 p-6 md:p-8 rounded-[25px] shadow-sm border border-zinc-100 dark:border-zinc-800">
-        <div className="flex justify-between items-center mb-6 md:mb-8">
+      <div className="gallery-card">
+        <div className="card-header">
           <div>
-            <h2 className="text-lg md:text-xl font-bold dark:text-white tracking-tight">Gallery</h2>
-            <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mt-1">Management</p>
+            <h2 className="card-title">Gallery</h2>
+            <p className="card-subtitle">Management</p>
           </div>
-          <div className="bg-zinc-100 dark:bg-zinc-800 p-2.5 rounded-xl text-zinc-400"><Layout size={18} /></div>
+          <div className="icon-box-alt"><Layout size={18} /></div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-4 mb-8">
+        <div className="gallery-grid">
           {images && images.slice(0, 4).map((img, idx) => (
-            <div key={idx} className="relative group aspect-square rounded-2xl overflow-hidden shadow-inner border border-zinc-100 dark:border-zinc-800">
-              <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url(${img})` }}></div>
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <button onClick={() => setImages(images.filter((_, i) => i !== idx))} className="bg-red-500 text-white p-2 rounded-xl"><X size={14} /></button>
+            <div key={idx} className="gallery-item group">
+              <div className="gallery-img-bg" style={{ backgroundImage: `url(${img})` }}></div>
+              <div className="gallery-overlay">
+                <button onClick={() => setImages(images.filter((_, i) => i !== idx))} className="btn-remove-img"><X size={14} /></button>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="space-y-4">
+        <div className="gallery-input-group">
           <input
             ref={imageInputRef}
             type="text"
             placeholder="Paste image URL..."
-            className="w-full px-5 py-3.5 rounded-2xl bg-zinc-100 dark:bg-zinc-800/50 dark:text-white border-2 border-transparent focus:border-blue-500 transition-all outline-none text-xs"
+            className="input-styled"
             onKeyDown={(e) => e.key === 'Enter' && handleAddImage()}
           />
-          <button
-            onClick={handleAddImage}
-            className="w-full bg-black dark:bg-white text-white dark:text-black py-3.5 rounded-2xl font-bold text-xs tracking-tight hover:opacity-90 transition shadow-xl"
-          >
+          <button onClick={handleAddImage} className="btn-full">
             Add Image
           </button>
         </div>
       </div>
 
       {/* Featured Works List */}
-      <div className="col-span-12 bg-white dark:bg-zinc-900 rounded-[25px] p-6 md:p-10 shadow-sm border border-zinc-100 dark:border-zinc-800">
-        <div className="flex justify-between items-center mb-8 md:mb-10">
-          <h3 className="text-lg md:text-xl font-bold dark:text-white tracking-tighter uppercase">Projects Timeline</h3>
-          <button onClick={() => setActivePage('Work')} className="text-[10px] font-bold text-zinc-400 hover:text-black dark:hover:text-white transition flex items-center gap-2 uppercase">VIEW ALL <ArrowRight size={14} /></button>
+      <div className="featured-section">
+        <div className="section-header">
+          <h3 className="card-title text-uppercase">Projects Timeline</h3>
+          <button onClick={() => setActivePage('Work')} className="link-view-all">VIEW ALL <ArrowRight size={14} /></button>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+        <div className="projects-grid">
           {workProjects.slice(0, 4).map((p) => (
-            <div key={p.id} className="group cursor-pointer" onClick={() => { setSelectedWork(p); setActivePage('Work'); }}>
-              <div className="aspect-[4/3] bg-zinc-100 dark:bg-zinc-800 rounded-[25px] mb-4 md:mb-6 flex items-center justify-center text-4xl md:text-5xl font-bold opacity-20 dark:opacity-40 group-hover:scale-105 transition-transform duration-500 border border-zinc-100 dark:border-zinc-700">
+            <div key={p.id} className="project-thumb-item group" onClick={() => { setSelectedWork(p); setActivePage('Work'); }}>
+              <div className="project-thumb-box">
                 {p.thumbnail}
               </div>
               <div>
-                <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1">{p.category}</div>
-                <h4 className="text-sm md:text-base font-bold dark:text-white">{p.title}</h4>
+                <div className="card-subtitle mb-1">{p.category}</div>
+                <h4 className="font-bold dark:text-white mb-1">{p.title}</h4>
               </div>
             </div>
           ))}
@@ -282,84 +276,82 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   };
 
   const renderAbout = () => (
-    <div className="space-y-12 animate-in fade-in duration-700 max-w-6xl mx-auto py-6 md:py-12">
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
-        {/* Left Side: Preview Style Block */}
-        <div className="w-full lg:w-1/2 bg-zinc-950 dark:bg-zinc-900 rounded-[25px] h-[300px] md:h-[400px] flex items-center justify-center border border-zinc-800 shadow-2xl relative overflow-hidden shrink-0">
-          <div className="text-center relative z-10 px-6">
-            <div className="text-3xl md:text-4xl font-bold mb-4 kakkhean-logo text-white tracking-tighter uppercase">KAKKHEAN</div>
-            <p className="text-zinc-500 font-mono tracking-widest text-[10px] md:text-xs italic uppercase">{aboutData.location} / Local</p>
-          </div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,_rgba(255,255,255,0.05),_transparent)]"></div>
+    <div className="about-container animate-fade-in">
+      {/* Left Side: Preview Style Block */}
+      <div className="about-preview">
+        <div className="relative z-10 px-6 text-center">
+          <div className="kakkhean-logo text-white text-4xl mb-4">KAKKHEAN</div>
+          <p className="text-zinc-500 font-mono text-xs uppercase tracking-widest">{aboutData.location} / Local</p>
+        </div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,_rgba(255,255,255,0.05),_transparent)]"></div>
+      </div>
+
+      {/* Right Side: Editable Form */}
+      <div className="about-form">
+        <div className="form-group">
+          <label className="form-label">Studio Heading</label>
+          <input
+            type="text"
+            name="title"
+            value={aboutData.title}
+            onChange={handleAboutChange}
+            className="input-large"
+          />
         </div>
 
-        {/* Right Side: Editable Form */}
-        <div className="w-full lg:w-1/2 space-y-6">
-          <div className="space-y-4">
-            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block ml-1">Studio Heading</label>
+        <div className="form-group">
+          <label className="form-label">Bio / Agency Description</label>
+          <textarea
+            name="bio"
+            value={aboutData.bio}
+            onChange={handleAboutChange}
+            rows={6}
+            className="textarea-styled"
+          />
+        </div>
+
+        <div className="image-upload-grid">
+          <button className="btn-upload-placeholder group">
+            <div className="w-8 h-8 rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm">
+              <Plus size={14} className="text-zinc-400" />
+            </div>
+            <span className="card-subtitle">Add Main Image</span>
+          </button>
+          <button className="btn-upload-placeholder group">
+            <div className="w-8 h-8 rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm">
+              <Layout size={14} className="text-zinc-400" />
+            </div>
+            <span className="card-subtitle">Add Image Slider</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 md:gap-8 pt-6 border-t dark:border-zinc-800">
+          <div className="form-group">
+            <label className="form-label">Location</label>
             <input
               type="text"
-              name="title"
-              value={aboutData.title}
+              name="location"
+              value={aboutData.location}
               onChange={handleAboutChange}
-              className="w-full bg-zinc-100 dark:bg-zinc-800/50 dark:text-white text-2xl font-bold tracking-tighter p-4 rounded-xl border-none outline-none focus:ring-2 ring-blue-500/20 transition-all font-sans uppercase"
+              className="input-large text-lg"
             />
           </div>
-
-          <div className="space-y-4">
-            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block ml-1">Bio / Agency Description</label>
-            <textarea
-              name="bio"
-              value={aboutData.bio}
+          <div className="form-group">
+            <label className="form-label">Availability</label>
+            <input
+              type="text"
+              name="availability"
+              value={aboutData.availability}
               onChange={handleAboutChange}
-              rows={6}
-              className="w-full bg-zinc-100 dark:bg-zinc-800/50 dark:text-white text-sm leading-relaxed p-4 rounded-xl border-none outline-none focus:ring-2 ring-blue-500/20 transition-all resize-none"
+              className="input-large text-lg"
             />
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-4 pb-2">
-            <button className="h-24 bg-zinc-50 dark:bg-zinc-800/30 border-2 border-dashed border-zinc-200 dark:border-zinc-700 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all group">
-              <div className="w-8 h-8 rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                <Plus size={14} className="text-zinc-400 group-hover:text-black dark:group-hover:text-white" />
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300">Add Main Image</span>
-            </button>
-            <button className="h-24 bg-zinc-50 dark:bg-zinc-800/30 border-2 border-dashed border-zinc-200 dark:border-zinc-700 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all group">
-              <div className="w-8 h-8 rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                <Layout size={14} className="text-zinc-400 group-hover:text-black dark:group-hover:text-white" />
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300">Add Image Slider</span>
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 md:gap-8 pt-6 border-t dark:border-zinc-800">
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block ml-1">Location</label>
-              <input
-                type="text"
-                name="location"
-                value={aboutData.location}
-                onChange={handleAboutChange}
-                className="w-full bg-zinc-100 dark:bg-zinc-800/50 dark:text-white text-xl font-bold p-3 rounded-xl border-none outline-none focus:ring-2 ring-blue-500/20 transition-all"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest block ml-1">Availability</label>
-              <input
-                type="text"
-                name="availability"
-                value={aboutData.availability}
-                onChange={handleAboutChange}
-                className="w-full bg-zinc-100 dark:bg-zinc-800/50 dark:text-white text-xl font-bold p-3 rounded-xl border-none outline-none focus:ring-2 ring-blue-500/20 transition-all"
-              />
-            </div>
-          </div>
-
-          <div className="pt-4">
-            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-center gap-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-              <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Changes are automatically saved across the site</span>
-            </div>
+        <div className="pt-4">
+          <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-center gap-3">
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+            <span className="card-subtitle text-blue-500">Changes are automatically saved across the site</span>
           </div>
         </div>
       </div>
@@ -369,33 +361,31 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   const renderWork = () => {
     if (selectedWork && activePage === 'Work') return renderWorkDetail();
     return (
-      <div className="space-y-2 md:space-y-3 animate-in fade-in duration-700 max-w-7xl mx-auto pb-1 md:pb-12">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-2">
-          <div className="flex items-center gap-6">
-            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold dark:text-white tracking-tighter leading-none uppercase">Works</h1>
-          </div>
-          <div className="text-zinc-400 font-mono text-[10px] md:text-xs uppercase tracking-widest">/ Selected Projects</div>
+      <div className="animate-fade-in max-w-7xl mx-auto pb-12 space-y-3">
+        <div className="flex flex-col md:flex-row justify-between items-end gap-2 mb-8">
+          <h1 className="text-5xl md:text-7xl font-bold dark:text-white tracking-tighter uppercase">Works</h1>
+          <div className="card-subtitle">/ Selected Projects</div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-10">
+        <div className="work-gallery-grid">
           {workProjects.map((project) => (
             <div key={project.id} onClick={() => setSelectedWork(project)} className="group cursor-pointer">
-              <div className="aspect-[16/10] bg-zinc-50 dark:bg-zinc-900 rounded-[25px] overflow-hidden mb-6 border border-zinc-100 dark:border-zinc-800 shadow-sm relative">
-                <div className="absolute inset-0 flex items-center justify-center text-[6rem] md:text-[8rem] font-bold opacity-5 dark:opacity-20 transition-transform duration-700 group-hover:scale-110">
+              <div className="project-card-media">
+                <div className="absolute inset-0 flex items-center justify-center text-8xl font-bold opacity-20 transition-transform duration-700 group-hover:scale-110">
                   {project.thumbnail && (project.thumbnail.startsWith('http') || project.thumbnail.startsWith('data:')) ? (
-                    <img src={project.thumbnail} alt={project.title} className="w-full h-full object-cover opacity-50 grayscale group-hover:grayscale-0 transition-all duration-700" />
+                    <img src={project.thumbnail} alt={project.title} className="project-img" />
                   ) : (
                     project.thumbnail
                   )}
                 </div>
-                <div className="absolute bottom-6 left-6 opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all">
-                  <div className="bg-white text-black px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 shadow-2xl">
+                <div className="project-hover-overlay">
+                  <div className="badge-case-study">
                     View Case Study <ArrowRight size={14} />
                   </div>
                 </div>
               </div>
               <div className="px-2">
-                <div className="text-[9px] font-bold uppercase tracking-[0.2em] text-zinc-400 mb-1">{project.category}</div>
-                <h3 className="text-xl md:text-2xl font-bold dark:text-white group-hover:underline underline-offset-8 uppercase">{project.title}</h3>
+                <div className="card-subtitle mb-1">{project.category}</div>
+                <h3 className="text-2xl font-bold dark:text-white uppercase">{project.title}</h3>
               </div>
             </div>
           ))}
@@ -405,62 +395,62 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   };
 
   const renderWorkDetail = () => (
-    <div className="space-y-8 md:space-y-12 animate-in fade-in slide-in-from-left-4 duration-500 max-w-6xl mx-auto py-6 md:py-12">
+    <div className="animate-slide-in-left max-w-6xl mx-auto py-12 space-y-12">
       <button
         onClick={() => setSelectedWork(null)}
-        className="flex items-center gap-2 text-zinc-500 hover:text-black dark:hover:text-white font-bold text-[10px] md:text-xs transition-all hover:-translate-x-1 uppercase"
+        className="back-btn"
       >
         <ArrowLeft size={16} /> Back to projects
       </button>
 
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-8 pt-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
         <div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2">{selectedWork.category}</div>
-          <h1 className="text-3xl md:text-5xl lg:text-7xl font-bold dark:text-white leading-none tracking-tighter uppercase">{selectedWork.title}</h1>
+          <div className="card-subtitle mb-2">{selectedWork.category}</div>
+          <h1 className="text-5xl lg:text-7xl font-bold dark:text-white leading-none tracking-tighter uppercase">{selectedWork.title}</h1>
         </div>
       </div>
 
-      <div className="aspect-video bg-zinc-950 dark:bg-zinc-900 rounded-[25px] shadow-2xl flex items-center justify-center text-white relative overflow-hidden border border-zinc-800">
+      <div className="work-detail-media">
         <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_bottom_left,_rgba(255,255,255,0.1),_transparent)]"></div>
         <div className="text-center relative z-10 px-4">
-          <div className="text-6xl md:text-8xl font-bold mb-4 opacity-20">{selectedWork.thumbnail}</div>
-          <div className="text-sm md:text-lg tracking-[0.5em] md:tracking-[1em] text-zinc-500 uppercase font-mono">{selectedWork.primaryImage}</div>
+          <div className="text-huge-thumb mb-4">{selectedWork.thumbnail}</div>
+          <div className="tracking-widest-xl">{selectedWork.primaryImage}</div>
         </div>
       </div>
     </div>
   );
 
   const renderContact = () => (
-    <div className="space-y-12 animate-in fade-in duration-700 max-w-6xl mx-auto py-6 md:py-12">
-      <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold dark:text-white tracking-tighter leading-none uppercase">Contact</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-        <div className="lg:col-span-7 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[25px] p-6 md:p-12 shadow-sm order-2 lg:order-1">
-          <h2 className="text-xl md:text-2xl font-bold mb-8 md:mb-10 dark:text-white tracking-tighter uppercase">Say Hello</h2>
+    <div className="contact-container animate-fade-in">
+      <h1 className="text-5xl lg:text-7xl font-bold dark:text-white tracking-tighter leading-none uppercase">Contact</h1>
+      <div className="contact-grid">
+        <div className="contact-form-wrapper">
+          <h2 className="text-2xl font-bold mb-10 dark:text-white tracking-tighter uppercase">Say Hello</h2>
           {formSubmitted ? (
-            <div className="text-center py-12 md:py-20 bg-zinc-50 dark:bg-zinc-800/50 rounded-3xl border-2 border-dashed border-zinc-200 dark:border-zinc-700 animate-in zoom-in duration-500">
-              <div className="text-4xl md:text-5xl mb-4 md:mb-6">🤟</div>
-              <h3 className="text-2xl md:text-3xl font-bold dark:text-white mb-2 tracking-tighter uppercase">Message Sent!</h3>
-              <p className="text-zinc-500 font-bold uppercase text-[10px] tracking-widest">I'll get back to you shortly.</p>
+            <div className="success-message-box">
+              <div className="text-5xl mb-6">🤟</div>
+              <h3 className="text-3xl font-bold dark:text-white mb-2 tracking-tighter uppercase">Message Sent!</h3>
+              <p className="card-subtitle">I'll get back to you shortly.</p>
             </div>
           ) : (
-            <div className="space-y-6 md:space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <div className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Your Name</label>
-                  <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="w-full px-6 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-black dark:focus:border-white transition-all outline-none font-bold text-sm" placeholder="Full name" />
+                  <label className="form-label">Your Name</label>
+                  <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="input-styled text-sm font-bold" placeholder="Full name" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Your Email</label>
-                  <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="w-full px-6 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-black dark:focus:border-white transition-all outline-none font-bold text-sm" placeholder="email@address.com" />
+                  <label className="form-label">Your Email</label>
+                  <input type="email" name="email" value={formData.email} onChange={handleInputChange} className="input-styled text-sm font-bold" placeholder="email@address.com" />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Message</label>
-                <textarea name="message" value={formData.message} onChange={handleInputChange} className="w-full px-6 py-4 rounded-2xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-black dark:focus:border-white transition-all outline-none h-32 md:h-40 resize-none font-bold text-sm" placeholder="Tell me about your project..." />
+                <label className="form-label">Message</label>
+                <textarea name="message" value={formData.message} onChange={handleInputChange} className="input-styled h-40 font-bold text-sm resize-none" placeholder="Tell me about your project..." />
               </div>
               <button
                 onClick={handleFormSubmit}
-                className="w-full md:w-auto bg-black dark:bg-white dark:text-black text-white px-8 py-4 rounded-2xl font-bold text-sm hover:scale-105 transition-all shadow-2xl flex items-center justify-center gap-3 uppercase tracking-tighter"
+                className="btn-full text-sm uppercase tracking-tighter flex items-center justify-center gap-3 w-auto px-8 py-4"
               >
                 Send Message <Send size={18} />
               </button>
@@ -468,33 +458,33 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
           )}
         </div>
 
-        <div className="lg:col-span-5 space-y-6 md:space-y-8 order-1 lg:order-2">
-          <div className="bg-zinc-950 dark:bg-zinc-900 text-white rounded-[25px] p-8 md:p-12 shadow-2xl relative overflow-hidden border border-zinc-800">
-            <h2 className="text-xl font-bold mb-8 md:mb-10 tracking-tighter uppercase">Direct Contact</h2>
-            <div className="space-y-6 md:space-y-8">
-              <div className="flex items-center gap-4 md:gap-5 group transition-colors">
-                <div className="p-3.5 md:p-4 bg-white/5 rounded-xl md:rounded-2xl group-hover:bg-white/10 transition-colors"><Mail size={18} md:size={20} /></div>
+        <div className="contact-info-wrapper space-y-8">
+          <div className="contact-info-card">
+            <h2 className="text-xl font-bold mb-10 tracking-tighter uppercase">Direct Contact</h2>
+            <div className="space-y-8">
+              <div className="flex items-center gap-5 group transition-colors">
+                <div className="p-4 bg-white/5 rounded-2xl group-hover:bg-white/10 transition-colors"><Mail size={20} /></div>
                 <div>
-                  <div className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">Email address</div>
-                  <span className="text-base md:text-lg font-bold tracking-tight">hello@kakkhean.com</span>
+                  <div className="card-subtitle mb-1">Email address</div>
+                  <span className="text-lg font-bold tracking-tight">hello@kakkhean.com</span>
                 </div>
               </div>
-              <div className="flex items-center gap-4 md:gap-5">
-                <div className="p-3.5 md:p-4 bg-white/5 rounded-xl md:rounded-2xl"><Globe size={18} md:size={20} /></div>
+              <div className="flex items-center gap-5">
+                <div className="p-4 bg-white/5 rounded-2xl"><Globe size={20} /></div>
                 <div>
-                  <div className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">Office</div>
-                  <span className="text-base md:text-lg font-bold tracking-tight">Phnom Penh, KH</span>
+                  <div className="card-subtitle mb-1">Office</div>
+                  <span className="text-lg font-bold tracking-tight">Phnom Penh, KH</span>
                 </div>
               </div>
             </div>
             <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-blue-500/10 rounded-full blur-[80px]"></div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 gap-6">
             {socialLinks.map((social) => (
-              <a key={social.name} href={social.url} className="p-6 md:p-8 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[25px] flex flex-col items-center gap-2 md:gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all shadow-sm text-zinc-400 hover:text-black dark:hover:text-white hover:scale-105">
-                <social.icon size={20} md:size={24} />
-                <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest font-mono italic">{social.name}</span>
+              <a key={social.name} href={social.url} className="p-8 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[25px] flex flex-col items-center gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all shadow-sm text-zinc-400 hover:text-black dark:hover:text-white hover:scale-105">
+                <social.icon size={24} />
+                <span className="card-subtitle font-mono italic">{social.name}</span>
               </a>
             ))}
           </div>
@@ -504,64 +494,62 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   );
 
   const renderAddProjectModal = () => (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setShowAddProjectModal(false)}></div>
-      <div className="bg-white dark:bg-zinc-900 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[30px] shadow-2xl relative z-10 border border-zinc-200 dark:border-zinc-800 animate-in zoom-in duration-300">
+    <div className="modal-backdrop">
+      <div className="modal-overlay" onClick={() => setShowAddProjectModal(false)}></div>
+      <div className="modal-content">
         <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 sticky top-0 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl z-20 flex justify-between items-center">
           <div>
             <h2 className="text-2xl font-bold dark:text-white tracking-tighter uppercase">Add New Project</h2>
-            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mt-1">Showcase your latest work</p>
+            <p className="card-subtitle mt-1">Showcase your latest work</p>
           </div>
-          <button onClick={() => setShowAddProjectModal(false)} className="bg-zinc-100 dark:bg-zinc-800 p-2 rounded-xl text-zinc-500 hover:text-black dark:hover:text-white transition-colors">
-            <X size={20} />
+          <button onClick={() => setShowAddProjectModal(false)} className="btn-icon">
+            <X size={20} className="icon-close-modal" />
           </button>
         </div>
 
         <div className="p-8 space-y-6">
-          {/* Main Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Topic Name</label>
-              <input type="text" name="topic" value={newProject.topic} onChange={handleAddProjectChange} className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs" placeholder="e.g. Modern E-Commerce" />
+              <label className="form-label">Topic Name</label>
+              <input type="text" name="topic" value={newProject.topic} onChange={handleAddProjectChange} className="input-styled font-bold text-xs" placeholder="e.g. Modern E-Commerce" />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Project Title</label>
-              <input type="text" name="title" value={newProject.title} onChange={handleAddProjectChange} className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs" placeholder="e.g. E-Commerce Platform" />
+              <label className="form-label">Project Title</label>
+              <input type="text" name="title" value={newProject.title} onChange={handleAddProjectChange} className="input-styled font-bold text-xs" placeholder="e.g. E-Commerce Platform" />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Description</label>
-            <textarea name="description" value={newProject.description} onChange={handleAddProjectChange} rows={4} className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs resize-none leading-relaxed" placeholder="Brief description of the project..." />
+            <label className="form-label">Description</label>
+            <textarea name="description" value={newProject.description} onChange={handleAddProjectChange} rows={4} className="input-styled font-bold text-xs resize-none leading-relaxed" placeholder="Brief description of the project..." />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Client Name</label>
-              <input type="text" name="client" value={newProject.client} onChange={handleAddProjectChange} className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs" placeholder="Client Name" />
+              <label className="form-label">Client Name</label>
+              <input type="text" name="client" value={newProject.client} onChange={handleAddProjectChange} className="input-styled font-bold text-xs" placeholder="Client Name" />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Year</label>
-              <input type="text" name="year" value={newProject.year} onChange={handleAddProjectChange} className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs" placeholder="2024" />
+              <label className="form-label">Year</label>
+              <input type="text" name="year" value={newProject.year} onChange={handleAddProjectChange} className="input-styled font-bold text-xs" placeholder="2024" />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Service (Tag)</label>
-              <input type="text" name="service" value={newProject.service} onChange={handleAddProjectChange} className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs" placeholder="Web Dev" />
+              <label className="form-label">Service (Tag)</label>
+              <input type="text" name="service" value={newProject.service} onChange={handleAddProjectChange} className="input-styled font-bold text-xs" placeholder="Web Dev" />
             </div>
           </div>
 
-          {/* Images Section */}
           <div className="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
             <h3 className="text-xs font-bold uppercase tracking-widest">Images</h3>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Main Image / Thumbnail</label>
+              <label className="form-label">Main Image / Thumbnail</label>
               <div className="relative">
                 <input
                   type="file"
                   accept="image/*"
                   onChange={(e) => handleImageUpload(e, true)}
-                  className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 file:text-zinc-700 hover:file:bg-zinc-300"
+                  className="input-styled input-file"
                 />
                 {newProject.thumbnail && newProject.thumbnail.startsWith('data:') && (
                   <img src={newProject.thumbnail} alt="Preview" className="mt-2 h-20 w-20 object-cover rounded-lg border border-zinc-200 dark:border-zinc-800" />
@@ -570,7 +558,7 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
             </div>
 
             <div className="space-y-3">
-              <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest ml-1">Secondary Images</label>
+              <label className="form-label">Secondary Images</label>
               {newProject.images.map((img, idx) => (
                 <div key={idx} className="space-y-2">
                   <div className="flex gap-2 items-start">
@@ -578,7 +566,7 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
                       type="file"
                       accept="image/*"
                       onChange={(e) => handleImageUpload(e, false, idx)}
-                      className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 dark:text-white border-2 border-transparent focus:border-zinc-300 dark:focus:border-zinc-700 transition-all outline-none font-bold text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-zinc-200 file:text-zinc-700 hover:file:bg-zinc-300"
+                      className="input-styled input-file"
                     />
                     {newProject.images.length > 1 && (
                       <button onClick={() => removeProjectImageField(idx)} className="p-3 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-colors">
@@ -591,7 +579,7 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
                   )}
                 </div>
               ))}
-              <button onClick={addProjectImageField} className="text-[10px] font-bold uppercase tracking-widest text-blue-500 hover:text-blue-600 flex items-center gap-1">
+              <button onClick={addProjectImageField} className="card-subtitle text-blue-500 hover:text-blue-600 flex items-center gap-1">
                 <Plus size={12} /> Add another image
               </button>
             </div>
@@ -601,7 +589,7 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
 
         <div className="p-6 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 sticky bottom-0 z-20 flex justify-end gap-3">
           <button onClick={() => setShowAddProjectModal(false)} className="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest text-zinc-500 hover:text-black dark:hover:text-white transition-colors">Cancel</button>
-          <button onClick={handleAddProjectSubmit} className="bg-black dark:bg-white text-white dark:text-black px-8 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:scale-105 transition shadow-lg">Save Project</button>
+          <button onClick={handleAddProjectSubmit} className="btn-primary uppercase tracking-widest text-xs btn-add">Save Project</button>
         </div>
       </div>
     </div>
@@ -619,39 +607,23 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   };
 
   return (
-    <div className="h-screen bg-[#f4f4f5] dark:bg-[#09090b] font-sans transition-colors duration-500 overflow-hidden flex flex-col lg:flex-row">
-
-      {/* MOBILE HEADER - Visible only on small screens */}
-      <header className="lg:hidden h-20 bg-[#0a0a0b] text-white flex items-center justify-between px-6 shrink-0 border-b border-white/5 z-50">
-        <div className="kakkhean-logo text-xl font-bold tracking-tighter">
-          KAKKHEAN
-        </div>
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2.5 bg-white/10 rounded-xl"
-        >
+    <div className="dashboard-container">
+      {/* MOBILE HEADER */}
+      <header className="mobile-header">
+        <div className="kakkhean-logo">KAKKHEAN</div>
+        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="btn-icon">
           {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </header>
 
-      {/* SIDEBAR / NAVIGATION RAIL */}
-      <aside className={`
-            fixed inset-0 lg:static z-[100] lg:z-auto
-            w-full lg:w-[320px] 
-            bg-[#0a0a0b] text-white py-12 
-            flex flex-col overflow-y-auto shrink-0 
-            transition-all duration-500 ease-in-out
-            border-r border-white/5
-            ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}>
-        <div className="px-10 mb-20 hidden lg:flex items-center justify-between">
-          <div className="kakkhean-logo text-2xl font-bold tracking-tighter text-white">
-            KAKKHEAN
-          </div>
+      {/* SIDEBAR */}
+      <aside className={`sidebar ${mobileMenuOpen ? 'open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="kakkhean-logo">KAKKHEAN</div>
           <MoreHorizontal size={18} className="text-zinc-700" />
         </div>
 
-        <nav className="flex-1 space-y-3 px-6 md:px-8 pt-8 lg:pt-0">
+        <nav className="nav-container">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activePage === item.label;
@@ -661,92 +633,77 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
                 onClick={() => {
                   setActivePage(item.label);
                   setSelectedWork(null);
-                  setMobileMenuOpen(false); // Close menu on click
+                  setMobileMenuOpen(false);
                 }}
-                className={`w-full group flex items-center gap-5 py-4 px-4 rounded-[25px] transition-all relative overflow-hidden ${isActive
-                  ? 'bg-white/10 text-white shadow-2xl translate-x-1'
-                  : 'text-zinc-500 hover:text-zinc-200 hover:bg-white/5'
-                  }`}
+                className={`nav-item ${isActive ? 'active' : ''}`}
               >
-                <div className={`p-2.5 rounded-xl transition-all ${isActive ? 'bg-white text-black scale-105 shadow-xl' : 'bg-zinc-900 group-hover:bg-zinc-800'}`}>
+                <div className="nav-icon-box">
                   <Icon size={18} />
                 </div>
-                <span className={`font-bold text-sm tracking-tight ${isActive ? 'text-white' : 'text-zinc-600 group-hover:text-zinc-300 underline-offset-4 group-hover:underline'}`}>
+                <span className="nav-label">
                   {item.label.toUpperCase()}
                 </span>
-                {isActive && <div className="absolute right-6 w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,1)]"></div>}
+                {isActive && <div className="active-indicator"></div>}
               </button>
             );
           })}
         </nav>
 
-        <div className="px-10 mt-auto pt-10 pb-8 lg:pb-0">
-          <div className="bg-zinc-900/50 p-6 rounded-[25px] border border-white/5 relative overflow-hidden mb-10 text-center">
-            <div className="flex flex-col items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full border-2 border-white/10 flex items-center justify-center font-bold text-xs bg-black shadow-inner">40%</div>
-              <div className="text-[8px] uppercase font-bold tracking-widest text-zinc-500 leading-tight">Project Visibility</div>
-            </div>
-            <button className="w-full bg-white text-black py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-tight transition hover:bg-zinc-200 shadow-xl">Complete</button>
+        <div className="sidebar-footer">
+          <div className="project-visibility-card">
+            <div className="pv-circle">40%</div>
+            <div className="card-subtitle mb-4">Project Visibility</div>
+            <button className="btn-complete">Complete</button>
           </div>
 
-          <div className="flex items-center gap-3 py-4 lg:p-3 hover:bg-white/5 rounded-[25px] transition cursor-pointer group">
-            <div className="w-10 h-10 rounded-2xl bg-zinc-800 border border-white/5 overflow-hidden shrink-0 shadow-2xl flex items-center justify-center">
-              <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=2662&auto=format&fit=crop" alt="User" className="w-full h-full object-cover" />
+          <div className="user-profile group">
+            <div className="user-avatar">
+              <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=2662&auto=format&fit=crop" alt="User" />
             </div>
             <div>
-              <h5 className="font-bold text-sm tracking-tighter text-white truncate">Andre Lacerda</h5>
-              <p className="text-[8px] text-zinc-500 truncate font-bold font-mono tracking-tighter mt-1">USER_ROLE</p>
+              <h5 className="font-bold text-sm tracking-tighter truncate">Andre Lacerda</h5>
+              <p className="card-subtitle truncate mt-1">USER_ROLE</p>
             </div>
           </div>
         </div>
       </aside>
 
       {/* MAIN AREA */}
-      <main className="flex-1 bg-[#f4f4f5] dark:bg-[#09090b] flex flex-col overflow-hidden transition-colors duration-500 relative">
-
-        {/* DESKTOP HEADER AREA - Hide on mobile */}
-        <header className="hidden lg:flex h-24 px-12 items-center justify-between border-b border-zinc-200 dark:border-zinc-900 bg-white/60 dark:bg-zinc-950/60 backdrop-blur-3xl relative z-20 shrink-0">
-          <div className="flex-1 max-w-xl relative group">
-            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400 flex items-center gap-3 group-focus-within:text-black dark:group-focus-within:text-white transition-colors">
+      <main className="main-area">
+        {/* DESKTOP HEADER */}
+        <header className="desktop-header">
+          <div className="search-bar">
+            <div className="search-icon-wrapper">
               <Search size={18} />
             </div>
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full h-12 pl-12 pr-6 bg-zinc-100 dark:bg-zinc-900/80 rounded-[25px] border-none focus:ring-2 ring-black/5 dark:ring-white/10 dark:text-white font-bold text-sm transition-all shadow-inner"
-            />
+            <input type="text" placeholder="Search..." className="search-input" />
           </div>
 
-          <div className="flex items-center gap-4 ml-12">
-            <div className="w-12 h-12 bg-white dark:bg-zinc-900 rounded-2xl flex items-center justify-center relative shadow-sm border border-zinc-100 dark:border-zinc-800 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all hover:scale-105 active:scale-95 group">
-              <Bell size={18} className="text-zinc-500 dark:text-zinc-400 group-hover:text-red-400" />
-              <span className="absolute top-4 right-4 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-zinc-950"></span>
+          <div className="header-actions">
+            <div className="action-btn btn-bell group">
+              <Bell size={18} />
+              <span className="notification-dot"></span>
             </div>
-            <div
-              onClick={() => setShowAddProjectModal(true)}
-              className="w-12 h-12 bg-zinc-950 dark:bg-white rounded-2xl flex items-center justify-center shadow-2xl cursor-pointer hover:opacity-80 transition-all hover:scale-105 active:scale-95">
-              <Plus size={18} className="text-white dark:text-black" />
+            <div onClick={() => setShowAddProjectModal(true)} className="action-btn btn-add">
+              <Plus size={18} />
             </div>
           </div>
         </header>
 
         {/* DYNAMIC CONTENT */}
-        <div className="flex-1 overflow-y-auto px-6 pb-6 pt-0 md:px-12 md:pb-12 md:pt-0 bg-white dark:bg-[#09090b] transition-colors duration-500 relative scroll-smooth">
-          <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] dark:opacity-[0.05] pointer-events-none bg-[url('https://grain-y.com/wp-content/uploads/2021/04/grain.png')]"></div>
-          <div className="relative z-10 h-full">
+        <div className="content-wrapper">
+          <div className="bg-grain"></div>
+          <div className="content-inner">
             {renderContent()}
           </div>
         </div>
 
         {/* MOBILE NAV MASK */}
         {mobileMenuOpen && (
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] lg:hidden"
-            onClick={() => setMobileMenuOpen(false)}
-          ></div>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[90] lg:hidden" onClick={() => setMobileMenuOpen(false)}></div>
         )}
 
-        {/* ADD PROJECT MODAL OVERLAY */}
+        {/* ADD PROJECT MODAL */}
         {showAddProjectModal && renderAddProjectModal()}
       </main>
     </div>

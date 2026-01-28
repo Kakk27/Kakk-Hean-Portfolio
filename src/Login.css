@@ -1,0 +1,119 @@
+/* Login.css */
+.login-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #09090b;
+    /* bg-dark */
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-card {
+    background-color: #18181b;
+    /* card-bg-dark */
+    padding: 3rem;
+    border-radius: 25px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border: 1px solid #27272a;
+    /* border-dark */
+    width: 100%;
+    max-width: 400px;
+    z-index: 10;
+    text-align: center;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.login-title {
+    color: white;
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: -0.05em;
+}
+
+.login-subtitle {
+    color: #a1a1aa;
+    /* text-zinc-400 */
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    text-align: left;
+}
+
+.login-label {
+    display: block;
+    color: #a1a1aa;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.login-input {
+    width: 100%;
+    padding: 1rem;
+    background-color: #27272a;
+    /* zinc-800 */
+    border: 1px solid transparent;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.login-input:focus {
+    border-color: #3b82f6;
+    /* blue-500 */
+    background-color: #09090b;
+}
+
+.btn-login {
+    background-color: white;
+    color: black;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.025em;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+    margin-top: 1rem;
+}
+
+.btn-login:hover {
+    transform: scale(1.02);
+    opacity: 0.9;
+}
+
+.error-message {
+    color: #ef4444;
+    /* red-500 */
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+.login-bg-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}

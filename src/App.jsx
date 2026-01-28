@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import Snowfall from 'react-snowfall';
 import KakkTunnel from './KakkTunnel';
 import Dashboard from './Dashboard';
@@ -7,6 +7,13 @@ import Contact from './Contact';
 import About from './About';
 import Work from './Work';
 import ProjectDetail from './ProjectDetail';
+import Login from './Login';
+
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = localStorage.getItem('isAdminAuthenticated') === 'true';
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
 
 function App() {
   // Central State: Holds the images for the whole app
@@ -50,14 +57,19 @@ function App() {
             </>
           } />
 
-          {/* Route 2: The Dashboard */}
+          {/* Login Route */}
+          <Route path="/login" element={<Login />} />
+
+          {/* Route 2: The Dashboard (Protected) */}
           <Route path="/admin" element={
-            <Dashboard
-              images={images}
-              setImages={setImages}
-              aboutData={aboutData}
-              setAboutData={setAboutData}
-            />
+            <ProtectedRoute>
+              <Dashboard
+                images={images}
+                setImages={setImages}
+                aboutData={aboutData}
+                setAboutData={setAboutData}
+              />
+            </ProtectedRoute>
           } />
 
           {/* ADD THIS ROUTE */}

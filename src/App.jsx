@@ -51,9 +51,7 @@ function App() {
             <>
               <KakkTunnel images={images} />
               {/* Hidden Admin Link at bottom left */}
-              <Link to="/admin" style={{ position: 'fixed', bottom: 10, left: 10, color: '#333', textDecoration: 'none', fontSize: '12px', zIndex: 200 }}>
-                Admin
-              </Link>
+
             </>
           } />
 

@@ -21,6 +21,7 @@ import {
   Menu
 } from 'lucide-react';
 import './Dashboard.css';
+import { projects as initialProjectsData } from './projectsData';
 
 const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   const [activePage, setActivePage] = useState('Home');
@@ -60,60 +61,24 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
     service: '',
   });
 
-  const [workProjects, setWorkProjects] = useState([
-    {
-      id: 1,
-      title: 'E-Commerce Platform',
-      thumbnail: '01',
-      category: 'Web Development',
-      client: 'TechStore Inc.',
-      year: '2024',
-      service: 'Full Stack Development',
-      topic: 'Modern E-Commerce Solution',
-      description: 'Developed a comprehensive e-commerce platform with advanced features including real-time inventory management, secure payment processing, and personalized user experiences.',
-      primaryImage: 'Primary View',
-      secondaryImage: 'Detail View'
-    },
-    {
-      id: 2,
-      title: 'Brand Identity Design',
-      thumbnail: '02',
-      category: 'Branding',
-      client: 'Creative Studio',
-      year: '2024',
-      service: 'Brand Design & Strategy',
-      topic: 'Complete Brand Transformation',
-      description: 'Created a complete brand identity system including logo design, color palette, typography, and brand guidelines. The project involved extensive market research.',
-      primaryImage: 'Brand System',
-      secondaryImage: 'Applications'
-    },
-    {
-      id: 3,
-      title: 'Mobile App Design',
-      thumbnail: '03',
-      category: 'UI/UX Design',
-      client: 'FitLife App',
-      year: '2023',
-      service: 'Mobile UI/UX Design',
-      topic: 'Fitness Tracking Application',
-      description: 'Designed an intuitive fitness tracking application focusing on user engagement and gamification. Features personalized workout plans and progress tracking.',
-      primaryImage: 'App Interface',
-      secondaryImage: 'User Flow'
-    },
-    {
-      id: 4,
-      title: 'Corporate Website',
-      thumbnail: '04',
-      category: 'Web Design',
-      client: 'Global Corp',
-      year: '2023',
-      service: 'Web Design & Development',
-      topic: 'Professional Corporate Presence',
-      description: 'Built a sophisticated corporate website showcasing company values, services, and portfolio. Integrated with CMS for easy content management.',
-      primaryImage: 'Homepage',
-      secondaryImage: 'Interior Pages'
-    },
-  ]);
+  const [workProjects, setWorkProjects] = useState(
+    initialProjectsData.map(p => ({
+      id: p.id,
+      title: p.title,
+      thumbnail: p.img,
+      category: p.tags[0] || 'Project',
+      client: p.client,
+      year: p.year,
+      service: p.tags.join(', '),
+      topic: p.title,
+      description: p.description,
+      primaryImage: p.gallery && p.gallery.length > 0 ? p.gallery[0] : '',
+      secondaryImage: p.gallery && p.gallery.length > 1 ? p.gallery[1] : '',
+      images: p.gallery || []
+    }))
+  );
+
+  const [isEditing, setIsEditing] = useState(false);
 
   const handleAddProjectChange = (e) => {
     const { name, value } = e.target;
@@ -146,26 +111,71 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
     setNewProject({ ...newProject, images: updatedImages });
   };
 
+  const handleEditProject = (project) => {
+    setNewProject({
+      id: project.id,
+      title: project.title,
+      topic: project.topic || '',
+      description: project.description,
+      thumbnail: project.thumbnail,
+      images: project.images.length > 0 ? project.images : [''],
+      client: project.client,
+      year: project.year,
+      service: project.service,
+      category: project.category
+    });
+    setIsEditing(true);
+    setShowAddProjectModal(true);
+  };
+
   const handleAddProjectSubmit = () => {
     if (!newProject.title || !newProject.description) return;
 
-    const project = {
-      id: workProjects.length + 1,
-      title: newProject.title,
-      thumbnail: newProject.thumbnail || (workProjects.length + 1).toString().padStart(2, '0'),
-      category: newProject.service || 'Project',
-      client: newProject.client || 'Client Name',
-      year: newProject.year,
-      service: newProject.service,
-      topic: newProject.topic,
-      description: newProject.description,
-      primaryImage: 'Primary View',
-      secondaryImage: 'Detail View',
-      images: newProject.images
-    };
+    if (isEditing) {
+      const updatedProjects = workProjects.map(p =>
+        p.id === newProject.id
+          ? {
+            ...p,
+            title: newProject.title,
+            thumbnail: newProject.thumbnail,
+            category: newProject.service || p.category, // Fallback if service is empty
+            client: newProject.client,
+            year: newProject.year,
+            service: newProject.service,
+            topic: newProject.topic,
+            description: newProject.description,
+            images: newProject.images,
+            primaryImage: newProject.images.length > 0 ? newProject.images[0] : '',
+            secondaryImage: newProject.images.length > 1 ? newProject.images[1] : ''
+          }
+          : p
+      );
+      setWorkProjects(updatedProjects);
+      // Also update the selectedWork if it's the one being edited so the view updates immediately
+      if (selectedWork && selectedWork.id === newProject.id) {
+        const updatedProject = updatedProjects.find(p => p.id === newProject.id);
+        setSelectedWork(updatedProject);
+      }
+    } else {
+      const project = {
+        id: workProjects.length + 1, // Simple ID generation
+        title: newProject.title,
+        thumbnail: newProject.thumbnail || (workProjects.length + 1).toString().padStart(2, '0'),
+        category: newProject.service || 'Project',
+        client: newProject.client || 'Client Name',
+        year: newProject.year,
+        service: newProject.service,
+        topic: newProject.topic,
+        description: newProject.description,
+        primaryImage: newProject.images.length > 0 ? newProject.images[0] : 'Primary View',
+        secondaryImage: newProject.images.length > 1 ? newProject.images[1] : 'Detail View',
+        images: newProject.images
+      };
+      setWorkProjects([project, ...workProjects]);
+    }
 
-    setWorkProjects([project, ...workProjects]);
     setShowAddProjectModal(false);
+    setIsEditing(false); // Reset editing state
     setNewProject({
       title: '', topic: '', description: '', thumbnail: '', images: [''], client: '', year: new Date().getFullYear().toString(), service: ''
     });
@@ -408,6 +418,12 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
           <div className="card-subtitle mb-2">{selectedWork.category}</div>
           <h1 className="text-5xl lg:text-7xl font-bold dark:text-white leading-none tracking-tighter uppercase">{selectedWork.title}</h1>
         </div>
+        <button
+          onClick={() => handleEditProject(selectedWork)}
+          className="px-6 py-3 bg-white text-black rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform shadow-lg"
+        >
+          Edit Project
+        </button>
       </div>
 
       <div className="work-detail-media">
@@ -499,8 +515,8 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
       <div className="modal-content">
         <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 sticky top-0 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl z-20 flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold dark:text-white tracking-tighter uppercase">Add New Project</h2>
-            <p className="card-subtitle mt-1">Showcase your latest work</p>
+            <h2 className="text-2xl font-bold dark:text-white tracking-tighter uppercase">{isEditing ? 'Edit Project' : 'Add New Project'}</h2>
+            <p className="card-subtitle mt-1">{isEditing ? 'Update project details' : 'Showcase your latest work'}</p>
           </div>
           <button onClick={() => setShowAddProjectModal(false)} className="btn-icon">
             <X size={20} className="icon-close-modal" />
@@ -684,7 +700,11 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
               <Bell size={18} />
               <span className="notification-dot"></span>
             </div>
-            <div onClick={() => setShowAddProjectModal(true)} className="action-btn btn-add">
+            <div onClick={() => {
+              setIsEditing(false);
+              setNewProject({ title: '', topic: '', description: '', thumbnail: '', images: [''], client: '', year: new Date().getFullYear().toString(), service: '' });
+              setShowAddProjectModal(true);
+            }} className="action-btn btn-add">
               <Plus size={18} />
             </div>
           </div>

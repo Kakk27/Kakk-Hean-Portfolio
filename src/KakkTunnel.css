@@ -240,19 +240,20 @@ strong,
 
 @media (max-width: 1024px) {
   .main-title {
-    font-size: 6rem;
+    font-size: 5rem;
   }
 }
 
 @media (max-width: 768px) {
   .main-title {
-    font-size: 4rem;
+    font-size: 3rem;
     letter-spacing: -2px;
   }
 
   .subtitle {
-    font-size: 1rem;
-    letter-spacing: 5px;
+    font-size: 0.8rem;
+    letter-spacing: 4px;
+    margin-top: 15px;
   }
 
   .menu-link {
@@ -273,7 +274,13 @@ strong,
 
 @media (max-width: 480px) {
   .main-title {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    margin-top: 10px;
   }
 
   .menu-link {

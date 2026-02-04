@@ -789,6 +789,14 @@ body {
     }
 }
 
+@media (max-width: 1024px) {
+    .hero-content {
+        height: auto;
+        min-height: 400px;
+        padding: 2rem;
+    }
+}
+
 .hero-text-wrap {
     position: relative;
     z-index: 10;

@@ -120,7 +120,7 @@ strong,
 
 /* --- BUTTONS --- */
 .nav-btn {
-  position: fixed;
+  position: absolute;
   bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
@@ -131,7 +131,7 @@ strong,
   font-size: 0.8rem;
   letter-spacing: 1px;
   cursor: pointer;
-  z-index: 200;
+  z-index: 10000;
   text-transform: uppercase;
   font-weight: 900;
 }

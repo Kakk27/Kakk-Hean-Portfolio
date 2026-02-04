@@ -30,6 +30,8 @@ body {
   min-height: 100dvh;
   background-color: #f4f4f5;
   /* Light gray base like the image */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 #root {

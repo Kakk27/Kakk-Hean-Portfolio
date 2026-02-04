@@ -30,6 +30,10 @@ strong,
   justify-content: center;
   align-items: center;
   font-family: 'Arial', sans-serif;
+  touch-action: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .motion-tunnel {

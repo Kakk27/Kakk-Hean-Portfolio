@@ -1675,3 +1675,416 @@ body {
 .input-file::file-selector-button:hover {
     background-color: #d4d4d8;
 }
+
+/* --- Modern Modal Redesign --- */
+
+.modal-modern {
+    background-color: white;
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.3);
+    border: none;
+    max-width: 50rem;
+    /* Wider for better layout */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important;
+    /* Override modal-content overflow */
+}
+
+.dark .modal-modern {
+    background-color: #09090b;
+    border: 1px solid #27272a;
+}
+
+/* Modal Header */
+.modal-header-modern {
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 1px solid #f4f4f5;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+}
+
+.dark .modal-header-modern {
+    border-color: #27272a;
+    background-color: rgba(9, 9, 11, 0.9);
+}
+
+.btn-icon-modern {
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    background-color: #f4f4f5;
+    color: #71717a;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dark .btn-icon-modern {
+    background-color: #27272a;
+    color: #a1a1aa;
+}
+
+.btn-icon-modern:hover {
+    background-color: #e4e4e7;
+    color: black;
+}
+
+.dark .btn-icon-modern:hover {
+    background-color: #3f3f46;
+    color: white;
+}
+
+/* Modal Body */
+.modal-body-modern {
+    padding: 2rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.form-section-modern {
+    margin-bottom: 2.5rem;
+}
+
+.section-title-modern {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #a1a1aa;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Inputs */
+.input-group-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.label-modern {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #52525b;
+    /* zinc-600 */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.dark .label-modern {
+    color: #a1a1aa;
+}
+
+.input-wrapper-modern {
+    display: flex;
+    align-items: center;
+    background-color: #f4f4f5;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    transition: all 0.2s;
+    padding: 0 0.75rem;
+}
+
+.dark .input-wrapper-modern {
+    background-color: rgba(39, 39, 42, 0.5);
+    border-color: transparent;
+}
+
+.input-wrapper-modern:focus-within {
+    background-color: white;
+    border-color: #3b82f6;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.dark .input-wrapper-modern:focus-within {
+    background-color: #18181b;
+    border-color: #3b82f6;
+}
+
+.input-icon-modern {
+    color: #a1a1aa;
+    flex-shrink: 0;
+    margin-right: 0.75rem;
+}
+
+.input-wrapper-modern:focus-within .input-icon-modern {
+    color: #3b82f6;
+}
+
+.input-field-modern {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0.875rem 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: black;
+    outline: none;
+}
+
+.dark .input-field-modern {
+    color: white;
+}
+
+.input-field-modern::placeholder {
+    color: #d4d4d8;
+    font-weight: 500;
+}
+
+.dark .input-field-modern::placeholder {
+    color: #52525b;
+}
+
+/* Visual Assets */
+.upload-zone-main {
+    aspect-ratio: 16 / 10;
+    background-color: #fafafa;
+    background-image: radial-gradient(#e4e4e7 1px, transparent 1px);
+    background-size: 24px 24px;
+    border: 2px dashed #e4e4e7;
+    border-radius: 1rem;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dark .upload-zone-main {
+    background-color: rgba(9, 9, 11, 0.5);
+    background-image: radial-gradient(#27272a 1px, transparent 1px);
+    border-color: #27272a;
+}
+
+.upload-zone-main:hover {
+    border-color: #3b82f6;
+    background-color: #f0f9ff;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05);
+}
+
+.dark .upload-zone-main:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+    border-color: #3b82f6;
+}
+
+.upload-zone-main.has-image {
+    border-style: solid;
+    border-color: transparent;
+    background: none;
+    padding: 0;
+}
+
+.dark .upload-zone-main.has-image {
+    border-color: #27272a;
+}
+
+.upload-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    color: #a1a1aa;
+    transition: color 0.3s;
+}
+
+.upload-zone-main:hover .upload-content {
+    color: #3b82f6;
+}
+
+.upload-icon-wrapper {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 1rem;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s;
+}
+
+.dark .upload-icon-wrapper {
+    background-color: #27272a;
+    border: 1px solid #3f3f46;
+}
+
+.upload-zone-main:hover .upload-icon-wrapper {
+    transform: scale(1.1) rotate(-5deg);
+    border-color: #3b82f6;
+}
+
+/* Gallery Styles */
+.gallery-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+}
+
+.gallery-item-modern {
+    position: relative;
+    aspect-ratio: 1/1;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid #e4e4e7;
+    background-color: #fafafa;
+    transition: transform 0.2s;
+}
+
+.dark .gallery-item-modern {
+    border-color: #27272a;
+    background-color: #18181b;
+}
+
+.gallery-item-modern:hover {
+    transform: scale(1.02);
+}
+
+.gallery-add-btn-modern {
+    aspect-ratio: 1/1;
+    border-radius: 1rem;
+    border: 2px dashed #e4e4e7;
+    background-color: transparent;
+    color: #a1a1aa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dark .gallery-add-btn-modern {
+    border-color: #27272a;
+}
+
+.gallery-add-btn-modern:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background-color: #f0f9ff;
+    transform: translateY(-2px);
+}
+
+.dark .gallery-add-btn-modern:hover {
+    background-color: rgba(59, 130, 246, 0.05);
+}
+
+.image-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.gallery-item-modern:hover .image-overlay,
+.upload-zone-main.has-image:hover .image-overlay {
+    opacity: 1;
+}
+
+.btn-remove-mini {
+    padding: 0.5rem;
+    background-color: #ef4444;
+    color: white;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.btn-remove-mini:hover {
+    transform: scale(1.1);
+}
+
+/* Footer */
+.modal-footer-modern {
+    padding: 1.5rem 2rem;
+    background-color: #fafafa;
+    border-top: 1px solid #f4f4f5;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    position: sticky;
+    bottom: 0;
+    z-index: 50;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+}
+
+.dark .modal-footer-modern {
+    background-color: #18181b;
+    border-color: #27272a;
+}
+
+.btn-cancel-modern {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #71717a;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-cancel-modern:hover {
+    color: black;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark .btn-cancel-modern:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.btn-save-modern {
+    padding: 0.75rem 2rem;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: black;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.dark .btn-save-modern {
+    background-color: white;
+    color: black;
+}
+
+.btn-save-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.btn-save-modern:active {
+    transform: translateY(0);
+}

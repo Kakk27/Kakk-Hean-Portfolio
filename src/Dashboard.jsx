@@ -19,10 +19,17 @@ import {
   Bell,
   Globe,
   Menu,
-  LogOut
+  LogOut,
+  Image as ImageIcon,
+  Calendar,
+  Briefcase,
+  Tag,
+  Type,
+  FileText,
+  Layers
 } from 'lucide-react';
 import './Dashboard.css';
-import { projects as initialProjectsData } from './projectsData';
+import { fetchProjects, createProject, updateProject } from './services/api';
 
 const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   const [activePage, setActivePage] = useState('Home');
@@ -62,22 +69,29 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
     service: '',
   });
 
-  const [workProjects, setWorkProjects] = useState(
-    initialProjectsData.map(p => ({
-      id: p.id,
-      title: p.title,
-      thumbnail: p.img,
-      category: p.tags[0] || 'Project',
-      client: p.client,
-      year: p.year,
-      service: p.tags.join(', '),
-      topic: p.title,
-      description: p.description,
-      primaryImage: p.gallery && p.gallery.length > 0 ? p.gallery[0] : '',
-      secondaryImage: p.gallery && p.gallery.length > 1 ? p.gallery[1] : '',
-      images: p.gallery || []
-    }))
-  );
+  const [workProjects, setWorkProjects] = useState([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      const data = await fetchProjects();
+      const mapped = data.map(p => ({
+        id: p.id,
+        title: p.title,
+        thumbnail: p.thumbnail || p.img,
+        category: p.category || (p.tags ? p.tags[0] : 'Project'),
+        client: p.client,
+        year: p.year,
+        service: p.service || (p.tags ? p.tags.join(', ') : ''),
+        topic: p.topic || p.title,
+        description: p.description,
+        primaryImage: (p.images && p.images[0]) || (p.gallery && p.gallery[0]) || '',
+        secondaryImage: (p.images && p.images[1]) || (p.gallery && p.gallery[1]) || '',
+        images: p.images || p.gallery || []
+      }));
+      setWorkProjects(mapped);
+    };
+    loadData();
+  }, []);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -129,57 +143,44 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
     setShowAddProjectModal(true);
   };
 
-  const handleAddProjectSubmit = () => {
+  const handleAddProjectSubmit = async () => {
     if (!newProject.title || !newProject.description) return;
 
-    if (isEditing) {
-      const updatedProjects = workProjects.map(p =>
-        p.id === newProject.id
-          ? {
-            ...p,
-            title: newProject.title,
-            thumbnail: newProject.thumbnail,
-            category: newProject.service || p.category, // Fallback if service is empty
-            client: newProject.client,
-            year: newProject.year,
-            service: newProject.service,
-            topic: newProject.topic,
-            description: newProject.description,
-            images: newProject.images,
-            primaryImage: newProject.images.length > 0 ? newProject.images[0] : '',
-            secondaryImage: newProject.images.length > 1 ? newProject.images[1] : ''
-          }
-          : p
-      );
-      setWorkProjects(updatedProjects);
-      // Also update the selectedWork if it's the one being edited so the view updates immediately
-      if (selectedWork && selectedWork.id === newProject.id) {
-        const updatedProject = updatedProjects.find(p => p.id === newProject.id);
-        setSelectedWork(updatedProject);
-      }
-    } else {
-      const project = {
-        id: workProjects.length + 1, // Simple ID generation
-        title: newProject.title,
-        thumbnail: newProject.thumbnail || (workProjects.length + 1).toString().padStart(2, '0'),
-        category: newProject.service || 'Project',
-        client: newProject.client || 'Client Name',
-        year: newProject.year,
-        service: newProject.service,
-        topic: newProject.topic,
-        description: newProject.description,
-        primaryImage: newProject.images.length > 0 ? newProject.images[0] : 'Primary View',
-        secondaryImage: newProject.images.length > 1 ? newProject.images[1] : 'Detail View',
-        images: newProject.images
-      };
-      setWorkProjects([project, ...workProjects]);
-    }
+    try {
+      if (isEditing) {
+        // Optimistic update
+        const updatedDocs = workProjects.map(p =>
+          p.id === newProject.id ? { ...p, ...newProject, thumbnail: newProject.thumbnail } : p
+        );
+        setWorkProjects(updatedDocs);
 
-    setShowAddProjectModal(false);
-    setIsEditing(false); // Reset editing state
-    setNewProject({
-      title: '', topic: '', description: '', thumbnail: '', images: [''], client: '', year: new Date().getFullYear().toString(), service: ''
-    });
+        // API Call
+        await updateProject(newProject.id, newProject);
+
+        if (selectedWork && selectedWork.id === newProject.id) {
+          setSelectedWork({ ...selectedWork, ...newProject });
+        }
+      } else {
+        const payload = {
+          ...newProject,
+          id: Date.now().toString(),
+          category: newProject.service || 'Project'
+        };
+        // Optimistic
+        setWorkProjects([payload, ...workProjects]);
+        // API
+        await createProject(payload);
+      }
+
+      setShowAddProjectModal(false);
+      setIsEditing(false);
+      setNewProject({
+        title: '', topic: '', description: '', thumbnail: '', images: [''], client: '', year: new Date().getFullYear().toString(), service: ''
+      });
+    } catch (error) {
+      console.error("Failed to save project", error);
+      alert("Failed to save project. Please ensure backend is running.");
+    }
   };
 
   const handleFormSubmit = () => {
@@ -407,6 +408,7 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
 
   const renderWorkDetail = () => (
     <div className="animate-slide-in-left max-w-6xl mx-auto py-12 space-y-12">
+      {/* Navigation & Actions */}
       <div className="flex justify-between items-center">
         <button
           onClick={() => setSelectedWork(null)}
@@ -422,6 +424,7 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
         </button>
       </div>
 
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
         <div>
           <div className="card-subtitle mb-2">{selectedWork.category}</div>
@@ -429,13 +432,66 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
         </div>
       </div>
 
-      <div className="work-detail-media">
-        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_bottom_left,_rgba(255,255,255,0.1),_transparent)]"></div>
-        <div className="text-center relative z-10 px-4">
-          <div className="text-huge-thumb mb-4">{selectedWork.thumbnail}</div>
-          <div className="tracking-widest-xl">{selectedWork.primaryImage}</div>
+      {/* Hero Image */}
+      <div className="w-full aspect-video rounded-[30px] overflow-hidden border border-zinc-100 dark:border-zinc-800 relative group">
+        {selectedWork.thumbnail && (selectedWork.thumbnail.startsWith('http') || selectedWork.thumbnail.startsWith('data:')) ? (
+          <img src={selectedWork.thumbnail} alt={selectedWork.title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
+            <span className="text-9xl font-bold opacity-10">{selectedWork.thumbnail}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Project Info & Description */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        {/* Metadata */}
+        <div className="lg:col-span-1 space-y-8">
+          <div className="p-8 rounded-[25px] bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm">
+            <h3 className="text-lg font-bold dark:text-white mb-6 uppercase tracking-tighter">Project Info</h3>
+            <div className="space-y-6">
+              <div>
+                <div className="card-subtitle mb-1">Client</div>
+                <div className="text-lg font-bold dark:text-white">{selectedWork.client}</div>
+              </div>
+              <div>
+                <div className="card-subtitle mb-1">Year</div>
+                <div className="text-lg font-bold dark:text-white">{selectedWork.year}</div>
+              </div>
+              <div>
+                <div className="card-subtitle mb-1">Services</div>
+                <div className="text-lg font-bold dark:text-white">{selectedWork.service}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="lg:col-span-2">
+          <h3 className="text-2xl font-bold dark:text-white mb-6 uppercase tracking-tighter">About The Project</h3>
+          <div className="prose dark:prose-invert max-w-none text-zinc-500 text-lg leading-relaxed">
+            {selectedWork.description ? selectedWork.description.split('\n').map((line, i) => (
+              <p key={i} className="mb-4">{line}</p>
+            )) : <p>No description available.</p>}
+          </div>
         </div>
       </div>
+
+      {/* Gallery */}
+      {selectedWork.images && selectedWork.images.length > 0 && (
+        <div className="space-y-8">
+          <h3 className="text-2xl font-bold dark:text-white uppercase tracking-tighter">Project Gallery</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {selectedWork.images.map((img, idx) => (
+              img && (img.startsWith('http') || img.startsWith('data:')) ? (
+                <div key={idx} className="aspect-[4/5] rounded-[25px] overflow-hidden border border-zinc-100 dark:border-zinc-800 hover:scale-[1.02] transition-transform duration-500">
+                  <img src={img} alt={`Gallery ${idx}`} className="w-200 h-200 object-cover" />
+                </div>
+              ) : null
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -515,100 +571,218 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   const renderAddProjectModal = () => (
     <div className="modal-backdrop">
       <div className="modal-overlay" onClick={() => setShowAddProjectModal(false)}></div>
-      <div className="modal-content">
-        <div className="p-8 border-b border-zinc-100 dark:border-zinc-800 sticky top-0 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl z-20 flex justify-between items-center">
+      <div className="modal-content modal-modern">
+        {/* Header */}
+        <div className="modal-header-modern">
           <div>
-            <h2 className="text-2xl font-bold dark:text-white tracking-tighter uppercase">{isEditing ? 'Edit Project' : 'Add New Project'}</h2>
-            <p className="card-subtitle mt-1">{isEditing ? 'Update project details' : 'Showcase your latest work'}</p>
+            <div className="flex items-center gap-3 mb-1">
+              <div className="p-2 bg-black dark:bg-white rounded-lg text-white dark:text-black">
+                {isEditing ? <FileText size={18} /> : <Plus size={18} />}
+              </div>
+              <h2 className="text-2xl font-bold dark:text-white tracking-tighter uppercase">
+                {isEditing ? 'Edit Project' : 'New Project'}
+              </h2>
+            </div>
+            <p className="card-subtitle ml-1">{isEditing ? 'Update project details' : 'Create a new portfolio entry'}</p>
           </div>
-          <button onClick={() => setShowAddProjectModal(false)} className="btn-icon">
-            <X size={20} className="icon-close-modal" />
+          <button onClick={() => setShowAddProjectModal(false)} className="btn-icon-modern">
+            <X size={20} />
           </button>
         </div>
 
-        <div className="p-8 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="form-label">Topic Name</label>
-              <input type="text" name="topic" value={newProject.topic} onChange={handleAddProjectChange} className="input-styled font-bold text-xs" placeholder="e.g. Modern E-Commerce" />
-            </div>
-            <div className="space-y-2">
-              <label className="form-label">Project Title</label>
-              <input type="text" name="title" value={newProject.title} onChange={handleAddProjectChange} className="input-styled font-bold text-xs" placeholder="e.g. E-Commerce Platform" />
-            </div>
-          </div>
+        <div className="modal-body-modern">
+          {/* Section 1: Essentials */}
+          <div className="form-section-modern">
+            <h3 className="section-title-modern"><Layers size={14} /> Project Essentials</h3>
 
-          <div className="space-y-2">
-            <label className="form-label">Description</label>
-            <textarea name="description" value={newProject.description} onChange={handleAddProjectChange} rows={4} className="input-styled font-bold text-xs resize-none leading-relaxed" placeholder="Brief description of the project..." />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="input-group-modern">
+                <label className="label-modern">Project Title</label>
+                <div className="input-wrapper-modern">
+                  <Type size={16} className="input-icon-modern" />
+                  <input
+                    type="text"
+                    name="title"
+                    value={newProject.title}
+                    onChange={handleAddProjectChange}
+                    className="input-field-modern"
+                    placeholder="e.g. E-Commerce Platform"
+                  />
+                </div>
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <label className="form-label">Client Name</label>
-              <input type="text" name="client" value={newProject.client} onChange={handleAddProjectChange} className="input-styled font-bold text-xs" placeholder="Client Name" />
-            </div>
-            <div className="space-y-2">
-              <label className="form-label">Year</label>
-              <input type="text" name="year" value={newProject.year} onChange={handleAddProjectChange} className="input-styled font-bold text-xs" placeholder="2024" />
-            </div>
-            <div className="space-y-2">
-              <label className="form-label">Service (Tag)</label>
-              <input type="text" name="service" value={newProject.service} onChange={handleAddProjectChange} className="input-styled font-bold text-xs" placeholder="Web Dev" />
-            </div>
-          </div>
-
-          <div className="space-y-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
-            <h3 className="text-xs font-bold uppercase tracking-widest">Images</h3>
-
-            <div className="space-y-2">
-              <label className="form-label">Main Image / Thumbnail</label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleImageUpload(e, true)}
-                  className="input-styled input-file"
-                />
-                {newProject.thumbnail && newProject.thumbnail.startsWith('data:') && (
-                  <img src={newProject.thumbnail} alt="Preview" className="mt-2 h-20 w-20 object-cover rounded-lg border border-zinc-200 dark:border-zinc-800" />
-                )}
+              <div className="input-group-modern">
+                <label className="label-modern">Topic / Category</label>
+                <div className="input-wrapper-modern">
+                  <Tag size={16} className="input-icon-modern" />
+                  <input
+                    type="text"
+                    name="topic"
+                    value={newProject.topic}
+                    onChange={handleAddProjectChange}
+                    className="input-field-modern"
+                    placeholder="e.g. Modern Web Design"
+                  />
+                </div>
               </div>
             </div>
 
-            <div className="space-y-3">
-              <label className="form-label">Secondary Images</label>
-              {newProject.images.map((img, idx) => (
-                <div key={idx} className="space-y-2">
-                  <div className="flex gap-2 items-start">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleImageUpload(e, false, idx)}
-                      className="input-styled input-file"
-                    />
-                    {newProject.images.length > 1 && (
-                      <button onClick={() => removeProjectImageField(idx)} className="p-3 bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-colors">
-                        <X size={16} />
-                      </button>
-                    )}
-                  </div>
-                  {img && img.startsWith('data:') && (
-                    <img src={img} alt={`Preview ${idx}`} className="h-20 w-20 object-cover rounded-lg border border-zinc-200 dark:border-zinc-800" />
-                  )}
-                </div>
-              ))}
-              <button onClick={addProjectImageField} className="card-subtitle text-blue-500 hover:text-blue-600 flex items-center gap-1">
-                <Plus size={12} /> Add another image
-              </button>
+            <div className="input-group-modern mt-4">
+              <label className="label-modern">Description</label>
+              <div className="input-wrapper-modern items-start pt-3">
+                <FileText size={16} className="input-icon-modern mt-1" />
+                <textarea
+                  name="description"
+                  value={newProject.description}
+                  onChange={handleAddProjectChange}
+                  rows={4}
+                  className="input-field-modern resize-y min-h-[100px]"
+                  placeholder="Describe the project goals, challenges, and solution..."
+                />
+              </div>
             </div>
           </div>
 
+          {/* Section 2: Details */}
+          <div className="form-section-modern">
+            <h3 className="section-title-modern"><Briefcase size={14} /> Project Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="input-group-modern">
+                <label className="label-modern">Client</label>
+                <div className="input-wrapper-modern">
+                  <User size={16} className="input-icon-modern" />
+                  <input
+                    type="text"
+                    name="client"
+                    value={newProject.client}
+                    onChange={handleAddProjectChange}
+                    className="input-field-modern"
+                    placeholder="Client Name"
+                  />
+                </div>
+              </div>
+              <div className="input-group-modern">
+                <label className="label-modern">Year</label>
+                <div className="input-wrapper-modern">
+                  <Calendar size={16} className="input-icon-modern" />
+                  <input
+                    type="text"
+                    name="year"
+                    value={newProject.year}
+                    onChange={handleAddProjectChange}
+                    className="input-field-modern"
+                    placeholder="2024"
+                  />
+                </div>
+              </div>
+              <div className="input-group-modern">
+                <label className="label-modern">Service</label>
+                <div className="input-wrapper-modern">
+                  <Layers size={16} className="input-icon-modern" />
+                  <input
+                    type="text"
+                    name="service"
+                    value={newProject.service}
+                    onChange={handleAddProjectChange}
+                    className="input-field-modern"
+                    placeholder="Development"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section 3: Visuals */}
+          <div className="form-section-modern">
+            <h3 className="section-title-modern"><ImageIcon size={14} /> Visual Assets</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Main Thumbnail */}
+              <div className="md:col-span-1">
+                <label className="label-modern mb-2 block">Thumbnail</label>
+                <div className={`upload-zone-main group ${newProject.thumbnail ? 'has-image' : ''}`}>
+                  {newProject.thumbnail ? (
+                    <div className="relative w-full h-full">
+                      <img src={newProject.thumbnail} alt="Thumbnail" className="w-full h-full object-cover" />
+                      <div className="image-overlay flex items-center justify-center">
+                        <label className="cursor-pointer relative group">
+                          <span className="text-white text-[10px] font-bold uppercase tracking-widest bg-black/50 px-3 py-1 rounded-full backdrop-blur-sm group-hover:bg-black/70 transition-colors">Change Thumbnail</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleImageUpload(e, true)}
+                            className="absolute inset-0 w-0 h-0 opacity-0 cursor-pointer"
+                            title=""
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="upload-content">
+                      <div className="upload-icon-wrapper">
+                        <ImageIcon size={24} className="text-zinc-400 group-hover:text-blue-500 transition-colors" />
+                      </div>
+                      <span className="text-xs font-bold uppercase tracking-widest">Upload Cover</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Secondary Images Gallery */}
+              <div className="md:col-span-2">
+                <label className="label-modern mb-2 block">Gallery Images</label>
+                <div className="gallery-grid-modern">
+                  {newProject.images.map((img, idx) => (
+                    <div key={idx} className="gallery-item-modern group">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImageUpload(e, false, idx)}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-50"
+                      />
+                      {img ? (
+                        <>
+                          <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
+                          <div className="image-overlay">
+                            {newProject.images.length > 1 && (
+                              <button
+                                onClick={(e) => { e.preventDefault(); removeProjectImageField(idx); }}
+                                className="btn-remove-mini relative z-50"
+                              >
+                                <X size={12} />
+                              </button>
+                            )}
+                            <span className="text-white text-[10px] font-bold uppercase tracking-widest">Change</span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex items-center justify-center h-full w-full">
+                          <Plus size={16} className="text-zinc-300 dark:text-zinc-700" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    onClick={addProjectImageField}
+                    className="gallery-add-btn-modern"
+                  >
+                    <Plus size={20} />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Add</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="p-6 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 sticky bottom-0 z-20 flex justify-end gap-3">
-          <button onClick={() => setShowAddProjectModal(false)} className="px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest text-zinc-500 hover:text-black dark:hover:text-white transition-colors">Cancel</button>
-          <button onClick={handleAddProjectSubmit} className="btn-primary uppercase tracking-widest text-xs btn-add">Save Project</button>
+        {/* Footer */}
+        <div className="modal-footer-modern">
+          <button onClick={() => setShowAddProjectModal(false)} className="btn-cancel-modern">
+            Cancel
+          </button>
+          <button onClick={handleAddProjectSubmit} className="btn-save-modern">
+            {isEditing ? 'Save Changes' : 'Create Project'} <ArrowRight size={16} />
+          </button>
         </div>
       </div>
     </div>

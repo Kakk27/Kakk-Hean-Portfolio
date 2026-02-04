@@ -10,7 +10,7 @@ const Login = () => {
     const handleLogin = (e) => {
         e.preventDefault();
         // Simple hardcoded check for demonstration
-        if (password === 'admin123') {
+        if (password === 'kakkforall') {
             localStorage.setItem('isAdminAuthenticated', 'true');
             navigate('/admin');
         } else {

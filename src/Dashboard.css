@@ -25,7 +25,7 @@ body {
 }
 
 .dashboard-container {
-    height: 90vh;
+    height: 100vh;
     background-color: var(--bg-light);
     font-family: var(--font-sans);
     transition: background-color 500ms;
@@ -1568,6 +1568,46 @@ body {
 
 .dark .back-btn:hover {
     color: white;
+}
+
+.edit-project-btn {
+    margin-left: 2000px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #ffffff;
+    background: white;
+    color: black;
+    height: 3rem;
+    width: 8rem;
+    border: 1px solid #ffffff;
+    border-radius: 15px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.edit-project-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 15px -3px rgba(255, 255, 255, 0.2);
+}
+
+.dark .edit-project-btn {
+    color: #ffffff;
+    background: white;
+    color: black;
+    height: 3rem;
+    width: 8rem;
+    border: 1px solid #ffffff;
+    border-radius: 15px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 /* Modals */

@@ -111,7 +111,7 @@ const ProjectDetail = () => {
                         const nextProject = projects[nextIndex];
                         return (
                             <Link to={`/work/${nextProject.id}`} className="next-link">
-                                {nextProject.title} ↗
+                                {nextProject.title} <span className="arrow"><ArrowUpRight size={40} strokeWidth={1.5} /></span>
                             </Link>
                         );
                     })()}

@@ -18,7 +18,8 @@ import {
   Search,
   Bell,
   Globe,
-  Menu
+  Menu,
+  LogOut
 } from 'lucide-react';
 import './Dashboard.css';
 import { projects as initialProjectsData } from './projectsData';
@@ -406,24 +407,26 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
 
   const renderWorkDetail = () => (
     <div className="animate-slide-in-left max-w-6xl mx-auto py-12 space-y-12">
-      <button
-        onClick={() => setSelectedWork(null)}
-        className="back-btn"
-      >
-        <ArrowLeft size={16} /> Back to projects
-      </button>
+      <div className="flex justify-between items-center">
+        <button
+          onClick={() => setSelectedWork(null)}
+          className="back-btn"
+        >
+          <ArrowLeft size={16} /> Back to projects
+        </button>
+        <button
+          onClick={() => handleEditProject(selectedWork)}
+          className="edit-project-btn"
+        >
+          Edit Project
+        </button>
+      </div>
 
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
         <div>
           <div className="card-subtitle mb-2">{selectedWork.category}</div>
           <h1 className="text-5xl lg:text-7xl font-bold dark:text-white leading-none tracking-tighter uppercase">{selectedWork.title}</h1>
         </div>
-        <button
-          onClick={() => handleEditProject(selectedWork)}
-          className="px-6 py-3 bg-white text-black rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform shadow-lg"
-        >
-          Edit Project
-        </button>
       </div>
 
       <div className="work-detail-media">
@@ -665,12 +668,27 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
           })}
         </nav>
 
+
+
         <div className="sidebar-footer">
-          <div className="project-visibility-card">
+          <div className="project-visibility-card mb-4">
             <div className="pv-circle">40%</div>
             <div className="card-subtitle mb-4">Project Visibility</div>
             <button className="btn-complete">Complete</button>
           </div>
+
+          <button
+            onClick={() => {
+              localStorage.removeItem('isAdminAuthenticated');
+              window.location.reload();
+            }}
+            className="nav-item text-red-500 hover:bg-red-500/10 mb-4"
+          >
+            <div className="nav-icon-box bg-red-500/10 text-red-500">
+              <LogOut size={18} />
+            </div>
+            <span className="nav-label">LOGOUT</span>
+          </button>
 
           <div className="user-profile group">
             <div className="user-avatar">

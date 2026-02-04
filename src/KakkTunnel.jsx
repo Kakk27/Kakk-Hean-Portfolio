@@ -31,6 +31,14 @@ const KakkTunnel = ({ images }) => {
     setMousePos({ rotateY: xNorm * 5, rotateX: yNorm * -5 });
   };
 
+  const handleTouchMove = (e) => {
+    if (isMenuOpen) return;
+    const touch = e.touches[0];
+    const xNorm = (touch.clientX / window.innerWidth - 0.5) * 2;
+    const yNorm = (touch.clientY / window.innerHeight - 0.5) * 2;
+    setMousePos({ rotateY: xNorm * 5, rotateX: yNorm * -5 });
+  };
+
   const cards = useMemo(() => {
     const numCards = 24;
     const cardsPerSide = numCards / 4; // 6 per side
@@ -87,7 +95,7 @@ const KakkTunnel = ({ images }) => {
   const menuItems = ['WORK', 'CONTACT', 'ABOUT', 'HOME'];
 
   return (
-    <div className="scene-container" onMouseMove={handleMouseMove}>
+    <div className="scene-container" onMouseMove={handleMouseMove} onTouchMove={handleTouchMove}>
 
       {/* --- 3D SCENE --- */}
       <motion.div

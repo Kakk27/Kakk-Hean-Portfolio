@@ -19,6 +19,7 @@ strong,
 /* --- LAYOUT & 3D SETUP --- */
 .scene-container {
   height: 100vh;
+  height: 100dvh;
   width: 100vw;
   background-color: #000000;
   color: white;

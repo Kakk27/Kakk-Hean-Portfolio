@@ -724,20 +724,7 @@ body {
     background-color: #09090b;
 }
 
-.bg-grain {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.03;
-    pointer-events: none;
-    background-image: url('https://grain-y.com/wp-content/uploads/2021/04/grain.png');
-}
 
-.dark .bg-grain {
-    opacity: 0.05;
-}
 
 .content-inner {
     position: relative;
@@ -991,6 +978,7 @@ body {
     height: 100%;
     background-size: cover;
     background-position: center;
+    background-repeat: no-repeat;
 }
 
 .gallery-overlay {
@@ -1571,7 +1559,7 @@ body {
 }
 
 .edit-project-btn {
-    margin-left: 2000px;
+    margin-left: auto;
     display: flex;
     align-items: center;
     justify-content: center;

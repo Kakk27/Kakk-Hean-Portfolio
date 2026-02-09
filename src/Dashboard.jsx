@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import './Dashboard.css';
 import { fetchProjects, createProject, updateProject } from './services/api';
+import { projects as fallbackProjects } from './projectsData';
 
 const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   const [activePage, setActivePage] = useState('Home');
@@ -51,10 +52,10 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
   ];
 
   const socialLinks = [
-    { name: 'GitHub', icon: Github, url: 'https://github.com/yourusername' },
-    { name: 'LinkedIn', icon: Linkedin, url: 'https://linkedin.com/in/yourusername' },
-    { name: 'Twitter', icon: Twitter, url: 'https://twitter.com/yourusername' },
-    { name: 'Instagram', icon: Instagram, url: 'https://instagram.com/yourusername' },
+    { name: 'GitHub', icon: Github, url: 'https://github.com/Kakk27' },
+    { name: 'LinkedIn', icon: Linkedin, url: 'https://linkedin.com/in/' },
+    { name: 'Facebook', icon: Twitter, url: 'https://facebook.com/kakk.lmao' },
+    { name: 'Instagram', icon: Instagram, url: 'https://instagram.com/kakkfr_' },
   ];
 
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
@@ -73,7 +74,11 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await fetchProjects();
+      let data = await fetchProjects();
+      if (!data || data.length === 0) {
+        console.log("Using fallback data");
+        data = fallbackProjects;
+      }
       const mapped = data.map(p => ({
         id: p.id,
         title: p.title,
@@ -485,7 +490,7 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
             {selectedWork.images.map((img, idx) => (
               img && (img.startsWith('http') || img.startsWith('data:')) ? (
                 <div key={idx} className="aspect-[4/5] rounded-[25px] overflow-hidden border border-zinc-100 dark:border-zinc-800 hover:scale-[1.02] transition-transform duration-500">
-                  <img src={img} alt={`Gallery ${idx}`} className="w-200 h-200 object-cover" />
+                  <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
                 </div>
               ) : null
             ))}
@@ -904,7 +909,7 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
 
         {/* DYNAMIC CONTENT */}
         <div className="content-wrapper">
-          <div className="bg-grain"></div>
+
           <div className="content-inner">
             {renderContent()}
           </div>

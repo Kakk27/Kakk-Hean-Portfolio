@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
-import Snowfall from 'react-snowfall';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate, useLocation } from 'react-router-dom';
 import KakkTunnel from './KakkTunnel';
 import Dashboard from './Dashboard';
 import Contact from './Contact';
@@ -8,6 +7,8 @@ import About from './About';
 import Work from './Work';
 import ProjectDetail from './ProjectDetail';
 import Login from './Login';
+
+import GrainOverlay from './components/GrainOverlay';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -34,23 +35,17 @@ function App() {
   return (
     <Router>
       <div style={{ position: 'relative', minHeight: '100vh', width: '100%' }}>
-        <Snowfall
-          color="white"
-          snowflakeCount={150}
-          style={{
-            position: 'fixed',
-            width: '100vw',
-            height: '100vh',
-            zIndex: 1000,
-            pointerEvents: 'none'
-          }}
-        />
+        <GrainOverlay />
         <Routes>
           {/* Route 1: The 3D Tunnel Website */}
           <Route path="/" element={
             <>
               <KakkTunnel images={images} />
-              {/* Hidden Admin Link at bottom left */}
+              <div style={{ position: 'fixed', bottom: 20, left: 20, zIndex: 9999, pointerEvents: 'auto' }}>
+                <Link to="/admin" style={{ color: 'rgba(255,255,255,0.05)', textDecoration: 'none', fontSize: '12px', fontWeight: 'bold', fontFamily: 'monospace' }}>
+                  ADMIN // AREA
+                </Link>
+              </div>
 
             </>
           } />

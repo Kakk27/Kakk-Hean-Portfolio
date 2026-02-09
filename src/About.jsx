@@ -1,6 +1,6 @@
 // src/About.jsx
 import React, { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import './About.css';
 import './KakkTunnel.css'; // Shared Menu Styles
@@ -47,6 +47,27 @@ const ScrollParagraph = ({ value, isBold = false }) => {
 const About = ({ aboutData }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState(null);
+  const [logoClicks, setLogoClicks] = useState(0);
+  const navigate = useNavigate();
+  const timerRef = useRef(null);
+
+  const handleLogoClick = () => {
+    const newCount = logoClicks + 1;
+    setLogoClicks(newCount);
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    if (newCount === 5) {
+      navigate('/admin');
+      setLogoClicks(0);
+    }
+
+    timerRef.current = setTimeout(() => {
+      setLogoClicks(0);
+    }, 2000);
+  };
 
   const text1 = aboutData.bio;
 
@@ -82,7 +103,7 @@ const About = ({ aboutData }) => {
     <div className="about-page">
 
       {/* Header */}
-      <div className="about-logo">KAKKHEAN</div>
+      <div className="about-logo" onClick={handleLogoClick} style={{ cursor: 'pointer', userSelect: 'none' }}>KAKKHEAN</div>
       <div className="about-label">ABOUT US</div>
 
       {/* --- SLIDING GALLERY --- */}

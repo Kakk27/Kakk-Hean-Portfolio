@@ -115,7 +115,7 @@ app.delete('/api/projects/:id', (req, res) => {
 app.post('/api/login', (req, res) => {
     const { password } = req.body;
     // In a real app, use hashed passwords and a database
-    if (password === 'admin123') {
+    if (password === 'admin122') {
         res.json({ success: true, token: 'mock-jwt-token-kakk-portfolio', user: { name: 'Admin', role: 'owner' } });
     } else {
         res.status(401).json({ success: false, message: 'Invalid credentials' });

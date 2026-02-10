@@ -40,10 +40,7 @@ body {
   width: 100%;
 }
 
-/* Prevent background image repetition on all elements (especially for mobile/iPhone) */
-* {
-  background-repeat: no-repeat;
-}
+
 
 /* Custom Scrollbar for premium feel */
 ::-webkit-scrollbar {

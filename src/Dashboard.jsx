@@ -72,30 +72,32 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
 
   const [workProjects, setWorkProjects] = useState([]);
 
+  const loadData = async () => {
+    let data = await fetchProjects();
+    if (!data || data.length === 0) {
+      console.log("Using fallback data");
+      data = fallbackProjects;
+    }
+    const mapped = data.map(p => ({
+      id: p.id,
+      title: p.title,
+      thumbnail: p.thumbnail || p.img,
+      category: p.category || (p.tags ? p.tags[0] : 'Project'),
+      client: p.client,
+      year: p.year,
+      service: p.service || (p.tags ? p.tags.join(', ') : ''),
+      topic: p.topic || p.title,
+      description: p.description,
+      primaryImage: (p.images && p.images[0]) || (p.gallery && p.gallery[0]) || '',
+      secondaryImage: (p.images && p.images[1]) || (p.gallery && p.gallery[1]) || '',
+      images: p.images || p.gallery || []
+    }));
+    setWorkProjects(mapped);
+  };
+
   useEffect(() => {
-    const loadData = async () => {
-      let data = await fetchProjects();
-      if (!data || data.length === 0) {
-        console.log("Using fallback data");
-        data = fallbackProjects;
-      }
-      const mapped = data.map(p => ({
-        id: p.id,
-        title: p.title,
-        thumbnail: p.thumbnail || p.img,
-        category: p.category || (p.tags ? p.tags[0] : 'Project'),
-        client: p.client,
-        year: p.year,
-        service: p.service || (p.tags ? p.tags.join(', ') : ''),
-        topic: p.topic || p.title,
-        description: p.description,
-        primaryImage: (p.images && p.images[0]) || (p.gallery && p.gallery[0]) || '',
-        secondaryImage: (p.images && p.images[1]) || (p.gallery && p.gallery[1]) || '',
-        images: p.images || p.gallery || []
-      }));
-      setWorkProjects(mapped);
-    };
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -148,40 +150,63 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
     setShowAddProjectModal(true);
   };
 
+  const resetProjectForm = () => {
+    setNewProject({
+      title: '', topic: '', description: '', thumbnail: '', images: [''],
+      client: '', year: new Date().getFullYear().toString(), service: ''
+    });
+    setIsEditing(false);
+  };
+
   const handleAddProjectSubmit = async () => {
     if (!newProject.title || !newProject.description) return;
 
     try {
       if (isEditing) {
         // Optimistic update
+        const prevProjects = [...workProjects];
         const updatedDocs = workProjects.map(p =>
           p.id === newProject.id ? { ...p, ...newProject, thumbnail: newProject.thumbnail } : p
         );
         setWorkProjects(updatedDocs);
 
-        // API Call
-        await updateProject(newProject.id, newProject);
-
-        if (selectedWork && selectedWork.id === newProject.id) {
-          setSelectedWork({ ...selectedWork, ...newProject });
+        try {
+          // API Call
+          await updateProject(newProject.id, newProject);
+          if (selectedWork && selectedWork.id === newProject.id) {
+            setSelectedWork({ ...selectedWork, ...newProject });
+          }
+          // Re-sync from server to ensure data integrity
+          await loadData();
+        } catch (apiError) {
+          // Rollback optimistic update on failure
+          setWorkProjects(prevProjects);
+          throw apiError;
         }
       } else {
+        const tempId = `temp-${Date.now()}`;
         const payload = {
           ...newProject,
-          id: Date.now().toString(),
+          id: tempId,
           category: newProject.service || 'Project'
         };
-        // Optimistic
-        setWorkProjects([payload, ...workProjects]);
-        // API
-        await createProject(payload);
+        // Optimistic add
+        setWorkProjects(prev => [payload, ...prev]);
+
+        try {
+          // API call — server returns created object with real ID
+          await createProject(payload);
+          // Re-fetch to get real server IDs and data
+          await loadData();
+        } catch (apiError) {
+          // Rollback: remove the optimistic entry
+          setWorkProjects(prev => prev.filter(p => p.id !== tempId));
+          throw apiError;
+        }
       }
 
       setShowAddProjectModal(false);
-      setIsEditing(false);
-      setNewProject({
-        title: '', topic: '', description: '', thumbnail: '', images: [''], client: '', year: new Date().getFullYear().toString(), service: ''
-      });
+      resetProjectForm();
     } catch (error) {
       console.error("Failed to save project", error);
       alert("Failed to save project. Please ensure backend is running.");
@@ -573,9 +598,14 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
     </div>
   );
 
+  const handleCloseModal = () => {
+    setShowAddProjectModal(false);
+    resetProjectForm();
+  };
+
   const renderAddProjectModal = () => (
     <div className="modal-backdrop">
-      <div className="modal-overlay" onClick={() => setShowAddProjectModal(false)}></div>
+      <div className="modal-overlay" onClick={handleCloseModal}></div>
       <div className="modal-content modal-modern">
         {/* Header */}
         <div className="modal-header-modern">
@@ -590,7 +620,7 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
             </div>
             <p className="card-subtitle ml-1">{isEditing ? 'Update project details' : 'Create a new portfolio entry'}</p>
           </div>
-          <button onClick={() => setShowAddProjectModal(false)} className="btn-icon-modern">
+          <button onClick={handleCloseModal} className="btn-icon-modern">
             <X size={20} />
           </button>
         </div>
@@ -782,7 +812,7 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
 
         {/* Footer */}
         <div className="modal-footer-modern">
-          <button onClick={() => setShowAddProjectModal(false)} className="btn-cancel-modern">
+          <button onClick={handleCloseModal} className="btn-cancel-modern">
             Cancel
           </button>
           <button onClick={handleAddProjectSubmit} className="btn-save-modern">
@@ -850,12 +880,6 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
 
 
         <div className="sidebar-footer">
-          <div className="project-visibility-card mb-4">
-            <div className="pv-circle">40%</div>
-            <div className="card-subtitle mb-4">Project Visibility</div>
-            <button className="btn-complete">Complete</button>
-          </div>
-
           <button
             onClick={() => {
               localStorage.removeItem('isAdminAuthenticated');
@@ -868,16 +892,6 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
             </div>
             <span className="nav-label">LOGOUT</span>
           </button>
-
-          <div className="user-profile group">
-            <div className="user-avatar">
-              <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=2662&auto=format&fit=crop" alt="User" />
-            </div>
-            <div>
-              <h5 className="font-bold text-sm tracking-tighter truncate">Andre Lacerda</h5>
-              <p className="card-subtitle truncate mt-1">USER_ROLE</p>
-            </div>
-          </div>
         </div>
       </aside>
 

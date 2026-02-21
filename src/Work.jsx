@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
-import { projects } from './projectsData';
 import './Work.css';
 import './KakkTunnel.css';
-
 import { ArrowUpRight } from 'lucide-react';
+import { useSiteData } from './SiteDataContext';
 
 const Work = () => {
+    const { workProjects } = useSiteData();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [hoveredLink, setHoveredLink] = useState(null);
 
@@ -39,7 +39,7 @@ const Work = () => {
 
             {/* LIST - Middle (Grows to fill space) */}
             <ul className="work-list">
-                {projects.map((project) => (
+                {workProjects.map((project) => (
                     <li key={project.id} className="work-item">
                         <Link to={`/work/${project.id}`} className="work-link">
                             <span className="project-name">
@@ -48,7 +48,9 @@ const Work = () => {
                             </span>
                             <span className="arrow"><ArrowUpRight size={40} strokeWidth={1.5} /></span>
                         </Link>
-                        <img src={project.img} className="thumbnail" alt={`${project.client} project`} />
+                        {project.img && (project.img.startsWith('http') || project.img.startsWith('data:')) && (
+                            <img src={project.img} className="thumbnail" alt={`${project.client} project`} />
+                        )}
                     </li>
                 ))}
             </ul>
@@ -56,8 +58,6 @@ const Work = () => {
             {/* FOOTER - Bottom */}
             <div className="contact-footer">
                 <div className="footer-col">
-                    5905 WILSHIRE BLVD, LOS ANGELES, CA 90036<br />
-                    UNITED STATES OF AMERICA<br /><br />
                     KAKKHEAN PORTFOLIO
                 </div>
                 <div className="footer-col">
@@ -66,13 +66,12 @@ const Work = () => {
                     LINKEDIN
                 </div>
                 <div className="footer-col">
-                    HELLO@KAKKHEAN.COM<br />
-                    +2 8733-2200<br /><br />
+                    HELLO@KAKKHEAN.COM<br /><br />
                     SAY HELLO
                 </div>
                 <div className="footer-col">
                     CRAFTED BY<br />
-                    ANDRE LACERDA<br /><br />
+                    KAKKHEAN<br /><br />
                     FOLLOW ME
                 </div>
             </div>

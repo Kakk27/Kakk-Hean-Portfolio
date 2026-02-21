@@ -4,8 +4,10 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 import './Contact.css';
 import './KakkTunnel.css';
+import { useSiteData } from './SiteDataContext';
 
 const Contact = () => {
+  const { contactData } = useSiteData();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState(null);
 
@@ -37,7 +39,7 @@ const Contact = () => {
       <div className="contact-logo">KAKKHEAN</div>
       <div className="contact-label">CONTACT</div>
 
-      <h1 className="contact-hero">HELLO@KAKKHEAN.COM</h1>
+      <h1 className="contact-hero">{contactData.email.toUpperCase()}</h1>
 
       <form className="contact-form">
         <div className="form-row">
@@ -50,23 +52,22 @@ const Contact = () => {
 
       <div className="contact-footer">
         <div className="footer-col">
-          5905 WILSHIRE BLVD, LOS ANGELES, CA 90036<br />
-          UNITED STATES OF AMERICA<br /><br />
+          {contactData.address.toUpperCase()}<br /><br />
           KAKKHEAN PORTFOLIO
         </div>
         <div className="footer-col">
-          TWITTER<br />
-          INSTAGRAM<br />
-          LINKEDIN
+          <a href={contactData.twitter} target="_blank" rel="noreferrer">TWITTER</a><br />
+          <a href={contactData.instagram} target="_blank" rel="noreferrer">INSTAGRAM</a><br />
+          <a href={contactData.linkedin} target="_blank" rel="noreferrer">LINKEDIN</a>
         </div>
         <div className="footer-col">
-          HELLO@KAKKHEAN.COM<br />
-          +2 8733-2200<br /><br />
+          {contactData.email.toUpperCase()}<br />
+          {contactData.phone}<br /><br />
           SAY HELLO
         </div>
         <div className="footer-col">
           CRAFTED BY<br />
-          ANDRE LACERDA<br /><br />
+          KAKKHEAN<br /><br />
           FOLLOW ME
         </div>
       </div>
@@ -157,7 +158,6 @@ const Contact = () => {
 
             </motion.div>
 
-            {/* FIXED: Changed text to CLOSE to match logic */}
             <button
               className="nav-btn close-trigger"
               onClick={() => setIsMenuOpen(false)}

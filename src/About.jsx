@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import './About.css';
 import './KakkTunnel.css'; // Shared Menu Styles
+import { useSiteData } from './SiteDataContext';
 
 // --- SCROLL ANIMATION COMPONENTS ---
 const Word = ({ children, range, progress }) => {
@@ -44,7 +45,8 @@ const ScrollParagraph = ({ value, isBold = false }) => {
   );
 };
 
-const About = ({ aboutData }) => {
+const About = () => {
+  const { aboutData } = useSiteData();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState(null);
   const [logoClicks, setLogoClicks] = useState(0);

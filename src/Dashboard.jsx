@@ -31,8 +31,10 @@ import {
 import './Dashboard.css';
 import { fetchProjects, createProject, updateProject } from './services/api';
 import { projects as fallbackProjects } from './projectsData';
+import { useSiteData } from './SiteDataContext';
 
-const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
+const Dashboard = () => {
+  const { images, setImages, aboutData, setAboutData, contactData, setContactData, workProjects, setWorkProjects, loadWorkProjects } = useSiteData();
   const [activePage, setActivePage] = useState('Home');
   const [selectedWork, setSelectedWork] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -70,35 +72,8 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
     service: '',
   });
 
-  const [workProjects, setWorkProjects] = useState([]);
-
-  const loadData = async () => {
-    let data = await fetchProjects();
-    if (!data || data.length === 0) {
-      console.log("Using fallback data");
-      data = fallbackProjects;
-    }
-    const mapped = data.map(p => ({
-      id: p.id,
-      title: p.title,
-      thumbnail: p.thumbnail || p.img,
-      category: p.category || (p.tags ? p.tags[0] : 'Project'),
-      client: p.client,
-      year: p.year,
-      service: p.service || (p.tags ? p.tags.join(', ') : ''),
-      topic: p.topic || p.title,
-      description: p.description,
-      primaryImage: (p.images && p.images[0]) || (p.gallery && p.gallery[0]) || '',
-      secondaryImage: (p.images && p.images[1]) || (p.gallery && p.gallery[1]) || '',
-      images: p.images || p.gallery || []
-    }));
-    setWorkProjects(mapped);
-  };
-
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // workProjects, setWorkProjects, loadWorkProjects all come from context above
+  const loadData = loadWorkProjects;
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -563,35 +538,71 @@ const Dashboard = ({ images, setImages, aboutData, setAboutData }) => {
           )}
         </div>
 
+        {/* ── Contact Settings (synced to public Contact page) ── */}
         <div className="contact-info-wrapper space-y-8">
           <div className="contact-info-card">
-            <h2 className="text-xl font-bold mb-10 tracking-tighter uppercase">Direct Contact</h2>
-            <div className="space-y-8">
-              <div className="flex items-center gap-5 group transition-colors">
-                <div className="p-4 bg-white/5 rounded-2xl group-hover:bg-white/10 transition-colors"><Mail size={20} /></div>
-                <div>
-                  <div className="card-subtitle mb-1">Email address</div>
-                  <span className="text-lg font-bold tracking-tight">hello@kakkhean.com</span>
-                </div>
+            <h2 className="text-xl font-bold mb-6 tracking-tighter uppercase">Contact Settings</h2>
+            <p className="card-subtitle mb-6">These values appear on the public Contact page.</p>
+            <div className="space-y-5">
+              <div className="form-group">
+                <label className="form-label">Public Email</label>
+                <input
+                  type="text"
+                  value={contactData.email}
+                  onChange={(e) => setContactData({ ...contactData, email: e.target.value })}
+                  className="input-styled text-sm font-bold"
+                  placeholder="hello@example.com"
+                />
               </div>
-              <div className="flex items-center gap-5">
-                <div className="p-4 bg-white/5 rounded-2xl"><Globe size={20} /></div>
-                <div>
-                  <div className="card-subtitle mb-1">Office</div>
-                  <span className="text-lg font-bold tracking-tight">Phnom Penh, KH</span>
-                </div>
+              <div className="form-group">
+                <label className="form-label">Phone</label>
+                <input
+                  type="text"
+                  value={contactData.phone}
+                  onChange={(e) => setContactData({ ...contactData, phone: e.target.value })}
+                  className="input-styled text-sm font-bold"
+                  placeholder="+855 12 345 678"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Office / Address</label>
+                <input
+                  type="text"
+                  value={contactData.address}
+                  onChange={(e) => setContactData({ ...contactData, address: e.target.value })}
+                  className="input-styled text-sm font-bold"
+                  placeholder="Phnom Penh, Cambodia"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Instagram URL</label>
+                <input
+                  type="text"
+                  value={contactData.instagram}
+                  onChange={(e) => setContactData({ ...contactData, instagram: e.target.value })}
+                  className="input-styled text-sm font-bold"
+                  placeholder="https://instagram.com/..."
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">LinkedIn URL</label>
+                <input
+                  type="text"
+                  value={contactData.linkedin}
+                  onChange={(e) => setContactData({ ...contactData, linkedin: e.target.value })}
+                  className="input-styled text-sm font-bold"
+                  placeholder="https://linkedin.com/in/..."
+                />
               </div>
             </div>
             <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-blue-500/10 rounded-full blur-[80px]"></div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
-            {socialLinks.map((social) => (
-              <a key={social.name} href={social.url} className="p-8 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-[25px] flex flex-col items-center gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-all shadow-sm text-zinc-400 hover:text-black dark:hover:text-white hover:scale-105">
-                <social.icon size={24} />
-                <span className="card-subtitle font-mono italic">{social.name}</span>
-              </a>
-            ))}
+          <div className="pt-4">
+            <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-center gap-3">
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+              <span className="card-subtitle text-blue-500">Changes sync live to the public Contact page</span>
+            </div>
           </div>
         </div>
       </div>

@@ -39,20 +39,26 @@ const Work = () => {
 
             {/* LIST - Middle (Grows to fill space) */}
             <ul className="work-list">
-                {workProjects.map((project) => (
-                    <li key={project.id} className="work-item">
-                        <Link to={`/work/${project.id}`} className="work-link">
-                            <span className="project-name">
-                                <span className="client">{project.client}</span>
-                                <span className="title">{project.title}</span>
-                            </span>
-                            <span className="arrow"><ArrowUpRight size={40} strokeWidth={1.5} /></span>
-                        </Link>
-                        {project.img && (project.img.startsWith('http') || project.img.startsWith('data:')) && (
-                            <img src={project.img} className="thumbnail" alt={`${project.client} project`} />
-                        )}
+                {workProjects.length > 0 ? (
+                    workProjects.map((project) => (
+                        <li key={project.id} className="work-item">
+                            <Link to={`/work/${project.id}`} className="work-link">
+                                <span className="project-name">
+                                    <span className="client">{project.client}</span>
+                                    <span className="title">{project.title}</span>
+                                </span>
+                                <span className="arrow"><ArrowUpRight size={40} strokeWidth={1.5} /></span>
+                            </Link>
+                            {project.img && (project.img.startsWith('http') || project.img.startsWith('data:')) && (
+                                <img src={project.img} className="thumbnail" alt={`${project.client} project`} />
+                            )}
+                        </li>
+                    ))
+                ) : (
+                    <li className="work-item" style={{ textAlign: 'center', padding: '100px 20px', color: '#666' }}>
+                        NO PROJECTS FOUND. CHECK ADMIN PANEL.
                     </li>
-                ))}
+                )}
             </ul>
 
             {/* FOOTER - Bottom */}

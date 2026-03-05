@@ -30,7 +30,6 @@ import {
 } from 'lucide-react';
 import './Dashboard.css';
 import { fetchProjects, createProject, updateProject } from './services/api';
-import { projects as fallbackProjects } from './projectsData';
 import { useSiteData } from './SiteDataContext';
 
 const Dashboard = () => {

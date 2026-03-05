@@ -159,6 +159,7 @@
 @media (max-width: 900px) {
     .detail-info {
         grid-template-columns: 1fr;
+        gap: 40px;
     }
 
     .detail-gallery {
@@ -173,5 +174,22 @@
         top: 20px;
         left: 20px;
         right: 20px;
+    }
+
+    .detail-header .logo {
+        font-size: 18px;
+    }
+
+    .detail-hero {
+        height: 50vh;
+        margin-bottom: 30px;
+    }
+
+    .description {
+        font-size: 16px;
+    }
+
+    .detail-content {
+        padding-top: 80px;
     }
 }

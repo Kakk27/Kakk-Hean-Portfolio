@@ -207,13 +207,13 @@
   }
 
   .about-description {
-    max-width: 80%;
+    max-width: 90%;
   }
 }
 
 @media (max-width: 768px) {
   .big-marquee-text {
-    font-size: 3rem;
+    font-size: 8vw;
   }
 
   .gallery-thumb {
@@ -222,8 +222,10 @@
   }
 
   .about-description {
-    padding: 0 20px;
+    padding: 0 30px;
     font-size: 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .about-footer {
@@ -242,7 +244,7 @@
 
 @media (max-width: 480px) {
   .big-marquee-text {
-    font-size: 2rem;
+    font-size: 10vw;
   }
 
   .about-footer {

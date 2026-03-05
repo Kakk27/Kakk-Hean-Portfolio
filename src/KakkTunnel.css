@@ -92,13 +92,14 @@ strong,
 
 .main-title {
   font-family: 'Brigends Expanded', 'Impact', 'Arial Black', sans-serif;
-  font-size: 10rem;
+  font-size: min(10rem, 15vw);
   margin: 0;
   line-height: 0.8;
   letter-spacing: -5px;
   text-transform: uppercase;
   color: white;
   transform: scaleY(0.8);
+  white-space: nowrap;
 }
 
 .subtitle {
@@ -252,7 +253,7 @@ strong,
 
 @media (max-width: 768px) {
   .main-title {
-    font-size: 3rem;
+    font-size: 11vw;
     letter-spacing: -2px;
   }
 
@@ -281,7 +282,8 @@ strong,
 
 @media (max-width: 480px) {
   .main-title {
-    font-size: 1.8rem;
+    font-size: 10vw;
+    letter-spacing: -1px;
   }
 
   .subtitle {

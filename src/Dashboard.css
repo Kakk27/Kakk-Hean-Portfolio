@@ -26,6 +26,7 @@ body {
 
 .dashboard-container {
     height: 100vh;
+    height: 100dvh;
     background-color: var(--bg-light);
     font-family: var(--font-sans);
     transition: background-color 500ms;
@@ -742,6 +743,7 @@ body {
 @media (min-width: 1024px) {
     .hero-card {
         grid-column: span 8;
+        height: 90%;
     }
 }
 
@@ -1621,6 +1623,7 @@ body {
     width: 100%;
     max-width: 42rem;
     max-height: 90vh;
+    max-height: 90dvh;
     overflow-y: auto;
     border-radius: 30px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
@@ -1628,6 +1631,13 @@ body {
     z-index: 10;
     border: 1px solid #e4e4e7;
     animation: zoomIn 0.3s ease-out;
+}
+
+@media (max-width: 640px) {
+    .modal-content {
+        border-radius: 20px;
+        max-height: 95dvh;
+    }
 }
 
 .dark .modal-content {
@@ -1702,6 +1712,12 @@ body {
     background-color: rgba(9, 9, 11, 0.9);
 }
 
+@media (max-width: 640px) {
+    .modal-header-modern {
+        padding: 1rem 1.25rem;
+    }
+}
+
 .btn-icon-modern {
     padding: 0.5rem;
     border-radius: 0.75rem;
@@ -1732,6 +1748,12 @@ body {
     padding: 2rem;
     overflow-y: auto;
     flex: 1;
+}
+
+@media (max-width: 640px) {
+    .modal-body-modern {
+        padding: 1.25rem;
+    }
 }
 
 .form-section-modern {

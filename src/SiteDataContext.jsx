@@ -2,7 +2,6 @@
 // Central data store shared between Dashboard (write) and public pages (read)
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchProjects } from './services/api';
-import { projects as fallbackProjects } from './projectsData';
 
 const SiteDataContext = createContext(null);
 
@@ -54,19 +53,15 @@ export const SiteDataProvider = ({ children }) => {
     });
 
     // ─── Gallery / Hero Images ─────────────────────────────────────
-    const [images, setImages] = useState([
-        'https://picsum.photos/id/1015/600/400',
-        'https://picsum.photos/id/1039/600/400',
-        'https://picsum.photos/id/1047/600/400',
-    ]);
+    const [images, setImages] = useState([]);
 
     // ─── Work Projects (shared live API data) ──────────────────────
     const [workProjects, setWorkProjects] = useState([]);
 
     const loadWorkProjects = async () => {
         let data = await fetchProjects();
-        if (!data || data.length === 0) {
-            data = fallbackProjects;
+        if (!data) {
+            data = [];
         }
         setWorkProjects(data.map(mapProject));
     };

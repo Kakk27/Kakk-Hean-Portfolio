@@ -11,6 +11,22 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
+
+# SQLite Database
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+data/*.db
+
+# Uploaded Files
+uploads/*
+!uploads/.gitkeep
+public/uploads/*
+!public/uploads/.gitkeep
 
 # Editor directories and files
 .vscode/*

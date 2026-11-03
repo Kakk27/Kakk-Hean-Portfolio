@@ -2,77 +2,40 @@
 import React, { useState, useMemo } from "react";
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
+import { useSiteData } from "./SiteDataContext";
+import { generateDefaultCards, getCardTransform, defaultImages } from "./utils/tunnelCards";
 import "./KakkTunnel.css";
 
-// Fallback images
-const defaultImages = [
-  "https://picsum.photos/id/1015/600/400",
-  "https://picsum.photos/id/1039/600/400",
-  "https://picsum.photos/id/1047/600/400",
-  "https://picsum.photos/id/1057/600/400",
-  "https://picsum.photos/id/106/600/400",
-  "https://picsum.photos/id/193/600/400",
-];
+const KakkTunnel = ({ images: propImages }) => {
+  const { images: contextImages, tunnelConfig } = useSiteData();
+  const activeImages =
+    (propImages && propImages.length > 0)
+      ? propImages
+      : (contextImages && contextImages.length > 0)
+        ? contextImages
+        : defaultImages;
 
-const TUNNEL_WIDTH = 60;
-const TUNNEL_HEIGHT = 40;
-
-const KakkTunnel = ({ images }) => {
-  const activeImages = images && images.length > 0 ? images : defaultImages;
-
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState(null);
 
-  const handleMouseMove = (e) => {
-    if (isMenuOpen) return;
-    const xNorm = (e.clientX / window.innerWidth - 0.5) * 2;
-    const yNorm = (e.clientY / window.innerHeight - 0.5) * 2;
-    setMousePos({ rotateY: xNorm * 5, rotateX: yNorm * -5 });
-  };
-
-  const handleTouchMove = (e) => {
-    if (isMenuOpen) return;
-    const touch = e.touches[0];
-    const xNorm = (touch.clientX / window.innerWidth - 0.5) * 2;
-    const yNorm = (touch.clientY / window.innerHeight - 0.5) * 2;
-    setMousePos({ rotateY: xNorm * 5, rotateX: yNorm * -5 });
-  };
-
   const cards = useMemo(() => {
-    const numCards = 24;
-    const cardsPerSide = numCards / 4; // 6 per side
-    return Array.from({ length: numCards }).map((_, i) => {
-      const side = Math.floor(i / cardsPerSide);
-      const indexOnSide = i % cardsPerSide;
-      const z = 400 - indexOnSide * 200; // Evenly spaced in depth
-      let x, y, rotY, rotX;
-
-      if (side === 0) { // LEFT
-        x = -TUNNEL_WIDTH;
-        y = (indexOnSide - cardsPerSide / 2 + 0.5) * (TUNNEL_HEIGHT / cardsPerSide);
-        rotY = 90; rotX = 0;
-      } else if (side === 1) { // RIGHT
-        x = TUNNEL_WIDTH;
-        y = (indexOnSide - cardsPerSide / 2 + 0.5) * (TUNNEL_HEIGHT / cardsPerSide);
-        rotY = -90; rotX = 0;
-      } else if (side === 2) { // TOP
-        x = (indexOnSide - cardsPerSide / 2 + 0.5) * (TUNNEL_WIDTH / cardsPerSide);
-        y = -TUNNEL_HEIGHT;
-        rotY = 0; rotX = -90;
-      } else { // BOTTOM
-        x = (indexOnSide - cardsPerSide / 2 + 0.5) * (TUNNEL_WIDTH / cardsPerSide);
-        y = TUNNEL_HEIGHT;
-        rotY = 0; rotX = 90;
-      }
-
-      return {
-        id: i,
-        img: activeImages[i % activeImages.length],
-        x, y, z, rotX, rotY
-      };
+    const defaults = generateDefaultCards(activeImages);
+    if (!tunnelConfig || !Array.isArray(tunnelConfig.cards)) {
+      return defaults;
+    }
+    return defaults.map((d, idx) => {
+      const custom = tunnelConfig.cards.find(c => c.id === d.id) || tunnelConfig.cards[idx];
+      return custom ? { ...d, ...custom, img: d.img } : d;
     });
-  }, [activeImages]);
+  }, [activeImages, tunnelConfig]);
+
+  const sceneTransform = useMemo(() => {
+    return {
+      rotateX: tunnelConfig?.scene?.rotateX ?? 0,
+      rotateY: tunnelConfig?.scene?.rotateY ?? 0,
+      z: tunnelConfig?.scene?.z ?? 400
+    };
+  }, [tunnelConfig]);
 
   const menuVariants = {
     hidden: { opacity: 0 },
@@ -95,16 +58,12 @@ const KakkTunnel = ({ images }) => {
   const menuItems = ['WORK', 'CONTACT', 'ABOUT', 'HOME'];
 
   return (
-    <div className="scene-container" onMouseMove={handleMouseMove} onTouchMove={handleTouchMove}>
+    <div className="scene-container">
 
       {/* --- 3D SCENE --- */}
       <motion.div
         className="motion-tunnel"
-        animate={{
-          rotateX: isMenuOpen ? 0 : mousePos.rotateX,
-          rotateY: isMenuOpen ? 0 : mousePos.rotateY,
-          z: 400
-        }}
+        animate={sceneTransform}
         transition={{ type: "spring", stiffness: 40, damping: 40 }}
       >
         <div className="grid-plane floor" />
@@ -121,7 +80,9 @@ const KakkTunnel = ({ images }) => {
             className="product-card no-invert"
             style={{
               backgroundImage: `url(${card.img})`,
-              transform: `translate(-50%, -50%) translate3d(${card.x}vw, ${card.y}vh, ${card.z}px) rotateX(${card.rotX}deg) rotateY(${card.rotY}deg)`,
+              transform: getCardTransform(card),
+              width: card.width ? `${card.width}px` : undefined,
+              height: card.height ? `${card.height}px` : undefined,
             }}
           />
         ))}

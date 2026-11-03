@@ -119,7 +119,7 @@ const ProjectDetail = () => {
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.6, delay: index * 0.1 }}
                             >
-                                <img src={img} alt={`${project.title} gallery ${index}`} />
+                                <img src={img} alt={`${project.title} gallery ${index}`} loading="lazy" decoding="async" />
                             </motion.div>
                         ))}
                     </div>

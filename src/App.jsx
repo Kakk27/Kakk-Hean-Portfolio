@@ -7,6 +7,7 @@ import About from './About';
 import Work from './Work';
 import ProjectDetail from './ProjectDetail';
 import Login from './Login';
+import AdminDevTunnel from './AdminDevTunnel';
 import GrainOverlay from './components/GrainOverlay';
 import { SiteDataProvider } from './SiteDataContext';
 
@@ -42,6 +43,13 @@ function App() {
             <Route path="/admin" element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } />
+
+            {/* Route 3: Admin 3D Dev Studio (Protected) */}
+            <Route path="/admin/dev" element={
+              <ProtectedRoute>
+                <AdminDevTunnel />
               </ProtectedRoute>
             } />
 

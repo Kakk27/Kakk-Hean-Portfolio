@@ -5,11 +5,31 @@ import { motion, AnimatePresence } from "framer-motion";
 import './Contact.css';
 import './KakkTunnel.css';
 import { useSiteData } from './SiteDataContext';
+import { submitContactMessage } from './services/api';
 
 const Contact = () => {
   const { contactData } = useSiteData();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState(null);
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.message) return;
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+    try {
+      await submitContactMessage(formData.name, formData.email, formData.message);
+      setSubmitStatus({ success: true, message: 'MESSAGE SENT SUCCESSFULLY!' });
+      setFormData({ name: '', email: '', message: '' });
+    } catch {
+      setSubmitStatus({ success: false, message: 'FAILED TO SEND MESSAGE. PLEASE TRY AGAIN.' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   // Animation Variants
   const menuVariants = {
@@ -41,13 +61,43 @@ const Contact = () => {
 
       <h1 className="contact-hero">{contactData.email.toUpperCase()}</h1>
 
-      <form className="contact-form">
+      <form className="contact-form" onSubmit={handleSubmit}>
         <div className="form-row">
-          <input type="text" placeholder="NAME" className="form-input" />
-          <input type="email" placeholder="EMAIL" className="form-input" />
+          <input
+            type="text"
+            placeholder="NAME"
+            className="form-input"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            required
+            disabled={isSubmitting}
+          />
+          <input
+            type="email"
+            placeholder="EMAIL"
+            className="form-input"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            required
+            disabled={isSubmitting}
+          />
         </div>
-        <textarea placeholder="MESSAGE" className="form-textarea"></textarea>
-        <button type="submit" className="submit-btn">SUBMIT</button>
+        <textarea
+          placeholder="MESSAGE"
+          className="form-textarea"
+          value={formData.message}
+          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+          required
+          disabled={isSubmitting}
+        ></textarea>
+        <button type="submit" className="submit-btn" disabled={isSubmitting}>
+          {isSubmitting ? 'SENDING...' : 'SUBMIT'}
+        </button>
+        {submitStatus && (
+          <div style={{ marginTop: '15px', color: submitStatus.success ? '#4ade80' : '#f87171', fontSize: '13px', fontWeight: 'bold', letterSpacing: '1px' }}>
+            {submitStatus.message}
+          </div>
+        )}
       </form>
 
       <div className="contact-footer">

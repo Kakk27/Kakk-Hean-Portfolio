@@ -1,20 +1,25 @@
 {
   "name": "kakk-portfolio",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "concurrently -k -p \"[{name}]\" -n \"SERVER,CLIENT\" -c \"yellow.bold,cyan.bold\" \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "vite --host",
+    "dev:server": "node server/index.js",
     "build": "vite build",
-    "lint": "eslint .",
+    "start": "node server/index.js",
     "preview": "vite preview",
-    "deploy": "npm run build && npx firebase-tools deploy"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@untitledui/icons": "^0.0.21",
-    "firebase": "^12.10.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "framer-motion": "^12.23.26",
     "lucide-react": "^0.563.0",
+    "multer": "^2.5.0",
     "react": "^19.2.0",
     "react-aria-components": "^1.14.0",
     "react-dom": "^19.2.0",

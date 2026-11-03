@@ -26,20 +26,66 @@ import {
   Tag,
   Type,
   FileText,
-  Layers
+  Layers,
+  Trash2,
+  Compass,
+  ExternalLink,
+  Crop,
+  Eye,
+  Maximize2
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import './Dashboard.css';
-import { fetchProjects, createProject, updateProject } from './services/api';
+import { fetchProjects, createProject, updateProject, deleteProject, uploadImage } from './services/api';
 import { useSiteData } from './SiteDataContext';
+import { ImageCropModal } from './components/ImageCropModal';
 
 const Dashboard = () => {
-  const { images, setImages, aboutData, setAboutData, contactData, setContactData, workProjects, setWorkProjects, loadWorkProjects } = useSiteData();
+  const {
+    images,
+    setImages,
+    saveImages,
+    aboutData,
+    setAboutData,
+    saveAboutData,
+    contactData,
+    setContactData,
+    saveContactData,
+    workProjects,
+    setWorkProjects,
+    loadWorkProjects,
+    deleteWorkProject
+  } = useSiteData();
   const [activePage, setActivePage] = useState('Home');
   const [selectedWork, setSelectedWork] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const imageInputRef = useRef(null);
+  const galleryFileInputRef = useRef(null);
+  const detailFileInputRef = useRef(null);
+  const galleryAssetFileInputRef = useRef(null);
+  const [activeGalleryAssetIndex, setActiveGalleryAssetIndex] = useState(0);
+  const [isGalleryDragging, setIsGalleryDragging] = useState(false);
+  const [cropModal, setCropModal] = useState({
+    isOpen: false,
+    imageSrc: '',
+    fileName: '',
+    fileSize: 0,
+    target: 'gallery', // 'gallery' | 'project-main' | 'project-gallery-X'
+  });
+  const [thumbActionModal, setThumbActionModal] = useState({
+    isOpen: false,
+    imageSrc: '',
+    title: '',
+    target: 'hero', // 'hero' | 'gallery-0', etc.
+  });
+  const [previewLightbox, setPreviewLightbox] = useState({
+    isOpen: false,
+    imageSrc: '',
+    title: '',
+    target: 'hero',
+  });
 
   useEffect(() => {
     document.documentElement.classList.add('dark');
@@ -82,19 +128,17 @@ const Dashboard = () => {
   };
 
   const handleImageUpload = (e, isMain = true, index = 0) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (isMain) {
-          setNewProject(prev => ({ ...prev, thumbnail: reader.result }));
-        } else {
-          const updatedImages = [...newProject.images];
-          updatedImages[index] = reader.result;
-          setNewProject(prev => ({ ...prev, images: updatedImages }));
-        }
-      };
-      reader.readAsDataURL(file);
+      const objectUrl = URL.createObjectURL(file);
+      setCropModal({
+        isOpen: true,
+        imageSrc: objectUrl,
+        fileName: file.name,
+        fileSize: file.size,
+        target: isMain ? 'project-main' : `project-gallery-${index}`,
+      });
+      e.target.value = '';
     }
   };
 
@@ -187,6 +231,26 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeleteProject = async (id, title) => {
+    if (!window.confirm(`Are you sure you want to delete "${title || 'this project'}"?`)) {
+      return;
+    }
+    try {
+      if (deleteWorkProject) {
+        await deleteWorkProject(id);
+      } else {
+        await deleteProject(id);
+        await loadData();
+      }
+      if (selectedWork && selectedWork.id === id) {
+        setSelectedWork(null);
+      }
+    } catch (error) {
+      console.error("Failed to delete project", error);
+      alert("Failed to delete project. Please ensure backend is running.");
+    }
+  };
+
   const handleFormSubmit = () => {
     if (formData.name && formData.email && formData.message) {
       setFormSubmitted(true);
@@ -201,10 +265,154 @@ const Dashboard = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleAddImage = () => {
-    if (imageInputRef.current && imageInputRef.current.value) {
-      setImages([...images, imageInputRef.current.value]);
-      imageInputRef.current.value = '';
+  const handleGalleryFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      setCropModal({
+        isOpen: true,
+        imageSrc: objectUrl,
+        fileName: file.name,
+        fileSize: file.size,
+        target: 'gallery',
+      });
+      e.target.value = '';
+    }
+  };
+
+  const handleAddImageClick = () => {
+    const url = imageInputRef.current?.value?.trim();
+    if (url) {
+      setCropModal({
+        isOpen: true,
+        imageSrc: url,
+        fileName: 'gallery-web-image.jpg',
+        fileSize: 0,
+        target: 'gallery',
+      });
+    } else {
+      galleryFileInputRef.current?.click();
+    }
+  };
+
+  const handleDetailCoverSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      setCropModal({
+        isOpen: true,
+        imageSrc: objectUrl,
+        fileName: file.name,
+        fileSize: file.size,
+        target: 'detail-hero',
+      });
+      e.target.value = '';
+    }
+  };
+
+  const handleGalleryAssetFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      setCropModal({
+        isOpen: true,
+        imageSrc: objectUrl,
+        fileName: file.name,
+        fileSize: file.size,
+        target: `detail-gallery-${activeGalleryAssetIndex}`,
+      });
+      e.target.value = '';
+    }
+  };
+
+  const handleOpenThumbnailAction = (imageSrc, title, target, assetIndex = 0) => {
+    setActiveGalleryAssetIndex(assetIndex);
+    if (!imageSrc) {
+      // If no image exists yet, directly prompt file upload
+      if (target === 'hero') {
+        detailFileInputRef.current?.click();
+      } else {
+        galleryAssetFileInputRef.current?.click();
+      }
+      return;
+    }
+    setThumbActionModal({
+      isOpen: true,
+      imageSrc,
+      title: title || 'Project Thumbnail',
+      target,
+    });
+  };
+
+  const handleTriggerChangeFromAction = () => {
+    const target = thumbActionModal.target;
+    setThumbActionModal((prev) => ({ ...prev, isOpen: false }));
+    if (target === 'hero') {
+      detailFileInputRef.current?.click();
+    } else {
+      galleryAssetFileInputRef.current?.click();
+    }
+  };
+
+  const handleTriggerPreviewFromAction = () => {
+    const { imageSrc, title, target } = thumbActionModal;
+    setThumbActionModal((prev) => ({ ...prev, isOpen: false }));
+    setPreviewLightbox({
+      isOpen: true,
+      imageSrc,
+      title,
+      target,
+    });
+  };
+
+  const handleCropUploadSuccess = ({ url }) => {
+    if (cropModal.target === 'gallery') {
+      const newImages = [url, ...images];
+      if (saveImages) {
+        saveImages(newImages);
+      } else {
+        setImages(newImages);
+      }
+      if (imageInputRef.current) {
+        imageInputRef.current.value = '';
+      }
+    } else if (cropModal.target === 'project-main') {
+      setNewProject((prev) => ({ ...prev, thumbnail: url }));
+    } else if (cropModal.target === 'detail-hero') {
+      if (selectedWork) {
+        const updatedWork = { ...selectedWork, thumbnail: url, img: url };
+        setSelectedWork(updatedWork);
+        updateProject(selectedWork.id, updatedWork)
+          .then(() => loadData())
+          .catch((err) => console.error("Failed to update project cover:", err));
+      }
+    } else if (cropModal.target?.startsWith('detail-gallery-')) {
+      const idx = parseInt(cropModal.target.replace('detail-gallery-', ''), 10);
+      if (selectedWork && Array.isArray(selectedWork.images)) {
+        const updatedImages = [...selectedWork.images];
+        updatedImages[idx] = url;
+        const updatedWork = { ...selectedWork, images: updatedImages };
+        setSelectedWork(updatedWork);
+        updateProject(selectedWork.id, updatedWork)
+          .then(() => loadData())
+          .catch((err) => console.error("Failed to update project gallery image:", err));
+      }
+    } else if (cropModal.target?.startsWith('project-gallery-')) {
+      const idx = parseInt(cropModal.target.replace('project-gallery-', ''), 10);
+      const updatedImages = [...newProject.images];
+      updatedImages[idx] = url;
+      setNewProject((prev) => ({ ...prev, images: updatedImages }));
+    }
+  };
+
+  const handleAddImage = handleAddImageClick;
+
+  const handleRemoveImage = (idx) => {
+    const newImages = images.filter((_, i) => i !== idx);
+    if (saveImages) {
+      saveImages(newImages);
+    } else {
+      setImages(newImages);
     }
   };
 
@@ -230,7 +438,26 @@ const Dashboard = () => {
       </div>
 
       {/* Gallery Management Card */}
-      <div className="gallery-card">
+      <div
+        className={`gallery-card ${isGalleryDragging ? 'ring-2 ring-white/50' : ''}`}
+        onDragOver={(e) => { e.preventDefault(); setIsGalleryDragging(true); }}
+        onDragLeave={(e) => { e.preventDefault(); setIsGalleryDragging(false); }}
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsGalleryDragging(false);
+          const file = e.dataTransfer.files?.[0];
+          if (file && file.type.startsWith('image/')) {
+            const objectUrl = URL.createObjectURL(file);
+            setCropModal({
+              isOpen: true,
+              imageSrc: objectUrl,
+              fileName: file.name,
+              fileSize: file.size,
+              target: 'gallery',
+            });
+          }
+        }}
+      >
         <div className="card-header">
           <div>
             <h2 className="card-title">Gallery</h2>
@@ -244,21 +471,33 @@ const Dashboard = () => {
             <div key={idx} className="gallery-item group">
               <div className="gallery-img-bg" style={{ backgroundImage: `url(${img})` }}></div>
               <div className="gallery-overlay">
-                <button onClick={() => setImages(images.filter((_, i) => i !== idx))} className="btn-remove-img"><X size={14} /></button>
+                <button onClick={() => handleRemoveImage(idx)} className="btn-remove-img"><X size={14} /></button>
               </div>
             </div>
           ))}
         </div>
 
         <div className="gallery-input-group">
+          {/* Hidden file input triggered when clicking Add Image */}
+          <input
+            ref={galleryFileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleGalleryFileSelect}
+          />
           <input
             ref={imageInputRef}
             type="text"
-            placeholder="Paste image URL..."
+            placeholder="Paste image URL or click Add Image..."
             className="input-styled"
-            onKeyDown={(e) => e.key === 'Enter' && handleAddImage()}
+            onKeyDown={(e) => e.key === 'Enter' && handleAddImageClick()}
           />
-          <button onClick={handleAddImage} className="btn-full">
+          <button
+            onClick={handleAddImageClick}
+            className="btn-full"
+            title="Upload from device or crop pasted URL"
+          >
             Add Image
           </button>
         </div>
@@ -273,8 +512,16 @@ const Dashboard = () => {
         <div className="projects-grid">
           {workProjects.slice(0, 4).map((p) => (
             <div key={p.id} className="project-thumb-item group" onClick={() => { setSelectedWork(p); setActivePage('Work'); }}>
-              <div className="project-thumb-box">
-                {p.thumbnail}
+              <div
+                className="project-thumb-box"
+                style={{
+                  backgroundImage: p.thumbnail ? `url(${p.thumbnail})` : 'none',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  opacity: 1
+                }}
+              >
+                {!p.thumbnail && <span className="opacity-40">{p.title || 'Project'}</span>}
               </div>
               <div>
                 <div className="card-subtitle mb-1">{p.category}</div>
@@ -288,7 +535,21 @@ const Dashboard = () => {
   );
 
   const handleAboutChange = (e) => {
-    setAboutData({ ...aboutData, [e.target.name]: e.target.value });
+    const updated = { ...aboutData, [e.target.name]: e.target.value };
+    if (saveAboutData) {
+      saveAboutData(updated);
+    } else {
+      setAboutData(updated);
+    }
+  };
+
+  const handleContactChange = (field, value) => {
+    const updated = { ...contactData, [field]: value };
+    if (saveContactData) {
+      saveContactData(updated);
+    } else {
+      setContactData(updated);
+    }
   };
 
   const renderAbout = () => (
@@ -410,94 +671,288 @@ const Dashboard = () => {
     );
   };
 
-  const renderWorkDetail = () => (
-    <div className="animate-slide-in-left max-w-6xl mx-auto py-12 space-y-12">
-      {/* Navigation & Actions */}
-      <div className="flex justify-between items-center">
-        <button
-          onClick={() => setSelectedWork(null)}
-          className="back-btn"
-        >
-          <ArrowLeft size={16} /> Back to projects
-        </button>
-        <button
-          onClick={() => handleEditProject(selectedWork)}
-          className="edit-project-btn"
-        >
-          Edit Project
-        </button>
-      </div>
+  const renderWorkDetail = () => {
+    if (!selectedWork) return null;
 
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 pt-4">
-        <div>
-          <div className="card-subtitle mb-2">{selectedWork.category}</div>
-          <h1 className="text-5xl lg:text-7xl font-bold dark:text-white leading-none tracking-tighter uppercase">{selectedWork.title}</h1>
-        </div>
-      </div>
+    const serviceTags = selectedWork.service
+      ? selectedWork.service.split(',').map((s) => s.trim()).filter(Boolean)
+      : (Array.isArray(selectedWork.tags) ? selectedWork.tags : []);
 
-      {/* Hero Image */}
-      <div className="w-full aspect-video rounded-[30px] overflow-hidden border border-zinc-100 dark:border-zinc-800 relative group">
-        {selectedWork.thumbnail && (selectedWork.thumbnail.startsWith('http') || selectedWork.thumbnail.startsWith('data:')) ? (
-          <img src={selectedWork.thumbnail} alt={selectedWork.title} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center">
-            <span className="text-9xl font-bold opacity-10">{selectedWork.thumbnail}</span>
-          </div>
-        )}
-      </div>
+    const galleryImages = (Array.isArray(selectedWork.images) && selectedWork.images.length > 0
+      ? selectedWork.images
+      : Array.isArray(selectedWork.gallery) ? selectedWork.gallery : []
+    ).filter(Boolean);
 
-      {/* Project Info & Description */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Metadata */}
-        <div className="lg:col-span-1 space-y-8">
-          <div className="p-8 rounded-[25px] bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm">
-            <h3 className="text-lg font-bold dark:text-white mb-6 uppercase tracking-tighter">Project Info</h3>
-            <div className="space-y-6">
-              <div>
-                <div className="card-subtitle mb-1">Client</div>
-                <div className="text-lg font-bold dark:text-white">{selectedWork.client}</div>
-              </div>
-              <div>
-                <div className="card-subtitle mb-1">Year</div>
-                <div className="text-lg font-bold dark:text-white">{selectedWork.year}</div>
-              </div>
-              <div>
-                <div className="card-subtitle mb-1">Services</div>
-                <div className="text-lg font-bold dark:text-white">{selectedWork.service}</div>
-              </div>
+    return (
+      <div className="work-detail-container animate-fade-in">
+        {/* Navigation & Actions Toolbar */}
+        <div className="work-detail-toolbar">
+          <div className="work-detail-toolbar-left">
+            <button
+              onClick={() => setSelectedWork(null)}
+              className="detail-btn-back"
+              title="Return to projects list"
+            >
+              <ArrowLeft size={16} /> Back to projects
+            </button>
+            <div className="detail-status-pill">
+              <span className="status-dot-active"></span>
+              <span>PORTFOLIO ENTRY</span>
             </div>
           </div>
+
+          <div className="work-detail-toolbar-right">
+            <Link
+              to={`/work/${selectedWork.id}`}
+              target="_blank"
+              className="detail-btn-secondary"
+              title="View on live public portfolio"
+            >
+              <ExternalLink size={14} />
+              <span>View Live</span>
+            </Link>
+            <button
+              onClick={() => handleEditProject(selectedWork)}
+              className="detail-btn-edit"
+              title="Edit project details"
+            >
+              <FileText size={14} />
+              <span>Edit Project</span>
+            </button>
+            <button
+              onClick={() => handleDeleteProject(selectedWork.id, selectedWork.title)}
+              className="detail-btn-delete"
+              title="Delete this project"
+            >
+              <Trash2 size={14} />
+              <span>Delete</span>
+            </button>
+          </div>
         </div>
 
-        {/* Description */}
-        <div className="lg:col-span-2">
-          <h3 className="text-2xl font-bold dark:text-white mb-6 uppercase tracking-tighter">About The Project</h3>
-          <div className="prose dark:prose-invert max-w-none text-zinc-500 text-lg leading-relaxed">
-            {selectedWork.description ? selectedWork.description.split('\n').map((line, i) => (
-              <p key={i} className="mb-4">{line}</p>
-            )) : <p>No description available.</p>}
+        {/* Title & Category Header */}
+        <div className="work-detail-header-block">
+          <div className="detail-category-tag">
+            <Tag size={12} />
+            <span>{selectedWork.category || 'CASE STUDY'}</span>
           </div>
+          <h1 className="detail-project-title">
+            {selectedWork.title}
+          </h1>
+        </div>
+
+        {/* Hero Image Showcase */}
+        <div
+          className="work-hero-frame group"
+          onClick={() => handleOpenThumbnailAction(selectedWork.thumbnail, `${selectedWork.title} (Cover Photo)`, 'hero')}
+          title="Click to preview full image or change"
+        >
+          {selectedWork.thumbnail ? (
+            <img
+              src={selectedWork.thumbnail}
+              alt={selectedWork.title}
+              className="work-hero-img"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                const fallback = e.currentTarget.parentElement?.querySelector('.work-hero-fallback');
+                if (fallback) fallback.style.display = 'flex';
+              }}
+            />
+          ) : null}
+
+          <div
+            className="work-hero-fallback"
+            style={{ display: selectedWork.thumbnail ? 'none' : 'flex' }}
+          >
+            <div className="work-hero-watermark">{selectedWork.title}</div>
+            <div className="p-4 rounded-2xl bg-zinc-900/80 border border-zinc-800 text-zinc-400 flex flex-col items-center gap-2 z-10">
+              <ImageIcon size={32} />
+              <span className="text-xs font-mono font-bold uppercase tracking-wider">No Cover Image • Click to Upload</span>
+            </div>
+          </div>
+
+          {/* Quick hover action pills on cover thumbnail */}
+          <div className="work-hero-hover-overlay">
+            {selectedWork.thumbnail && (
+              <button
+                type="button"
+                className="thumb-quick-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPreviewLightbox({
+                    isOpen: true,
+                    imageSrc: selectedWork.thumbnail,
+                    title: `${selectedWork.title} (Cover Photo)`,
+                    target: 'hero',
+                  });
+                }}
+                title="Preview full size image"
+              >
+                <Eye size={15} />
+                <span>Preview</span>
+              </button>
+            )}
+            <button
+              type="button"
+              className="thumb-quick-btn thumb-quick-btn-primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                detailFileInputRef.current?.click();
+              }}
+              title="Upload new image and crop"
+            >
+              <Crop size={15} />
+              <span>Change Image</span>
+            </button>
+          </div>
+
+          <input
+            ref={detailFileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleDetailCoverSelect}
+          />
+          <input
+            ref={galleryAssetFileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleGalleryAssetFileSelect}
+          />
+        </div>
+
+        {/* Two-Column Information & Story Layout */}
+        <div className="work-detail-body-grid">
+          {/* Left Column: Project Info Card */}
+          <aside className="detail-card">
+            <h3 className="detail-card-title">
+              <Briefcase size={16} />
+              <span>Project Details</span>
+            </h3>
+
+            <div className="detail-meta-list">
+              <div className="detail-meta-item">
+                <span className="detail-meta-label">
+                  <User size={12} /> Client
+                </span>
+                <span className="detail-meta-val">{selectedWork.client || 'Confidential'}</span>
+              </div>
+
+              <div className="detail-meta-item">
+                <span className="detail-meta-label">
+                  <Calendar size={12} /> Year
+                </span>
+                <span className="detail-meta-val">{selectedWork.year || new Date().getFullYear()}</span>
+              </div>
+
+              <div className="detail-meta-item">
+                <span className="detail-meta-label">
+                  <Tag size={12} /> Category
+                </span>
+                <span className="detail-meta-val">{selectedWork.category || 'General'}</span>
+              </div>
+
+              <div className="detail-meta-item">
+                <span className="detail-meta-label">
+                  <Layers size={12} /> Services & Scope
+                </span>
+                <div className="detail-services-chips">
+                  {serviceTags.length > 0 ? (
+                    serviceTags.map((tag, idx) => (
+                      <span key={idx} className="detail-service-chip">{tag}</span>
+                    ))
+                  ) : (
+                    <span className="detail-meta-val text-sm font-normal text-zinc-500">Not specified</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* Right Column: About Description & Gallery */}
+          <main className="detail-main-column">
+            <section className="detail-card">
+              <h3 className="detail-card-title">
+                <FileText size={16} />
+                <span>About The Project</span>
+              </h3>
+
+              <div className="detail-description-text">
+                {selectedWork.description ? (
+                  selectedWork.description.split('\n').map((line, i) => (
+                    <p key={i}>{line}</p>
+                  ))
+                ) : (
+                  <p className="text-zinc-500 italic">No description added yet. Click &apos;Edit Project&apos; to add project background.</p>
+                )}
+              </div>
+            </section>
+
+            {/* Project Gallery if present */}
+            {galleryImages.length > 0 && (
+              <section className="detail-card">
+                <h3 className="detail-card-title">
+                  <ImageIcon size={16} />
+                  <span>Gallery & Assets ({galleryImages.length})</span>
+                </h3>
+
+                <div className="detail-gallery-grid">
+                  {galleryImages.map((img, idx) => (
+                    <div
+                      key={idx}
+                      className="detail-gallery-item group"
+                      onClick={() => handleOpenThumbnailAction(img, `${selectedWork.title} - Asset #${idx + 1}`, `detail-gallery-${idx}`, idx)}
+                      title="Click to preview or change"
+                    >
+                      <img
+                        src={img}
+                        alt={`Asset ${idx + 1}`}
+                        className="detail-gallery-img"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                      />
+                      <div className="detail-gallery-hover-overlay">
+                        <button
+                          type="button"
+                          className="thumb-quick-btn"
+                          style={{ padding: '0.45rem 0.85rem', fontSize: '0.7rem' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPreviewLightbox({
+                              isOpen: true,
+                              imageSrc: img,
+                              title: `${selectedWork.title} - Asset #${idx + 1}`,
+                              target: `detail-gallery-${idx}`,
+                            });
+                          }}
+                        >
+                          <Eye size={13} />
+                          <span>Preview</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="thumb-quick-btn thumb-quick-btn-primary"
+                          style={{ padding: '0.45rem 0.85rem', fontSize: '0.7rem' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveGalleryAssetIndex(idx);
+                            galleryAssetFileInputRef.current?.click();
+                          }}
+                        >
+                          <Crop size={13} />
+                          <span>Change</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
+          </main>
         </div>
       </div>
-
-      {/* Gallery */}
-      {selectedWork.images && selectedWork.images.length > 0 && (
-        <div className="space-y-8">
-          <h3 className="text-2xl font-bold dark:text-white uppercase tracking-tighter">Project Gallery</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {selectedWork.images.map((img, idx) => (
-              img && (img.startsWith('http') || img.startsWith('data:')) ? (
-                <div key={idx} className="aspect-[4/5] rounded-[25px] overflow-hidden border border-zinc-100 dark:border-zinc-800 hover:scale-[1.02] transition-transform duration-500">
-                  <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
-                </div>
-              ) : null
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+    );
+  };
 
   const renderContact = () => (
     <div className="contact-container animate-fade-in">
@@ -548,7 +1003,7 @@ const Dashboard = () => {
                 <input
                   type="text"
                   value={contactData.email}
-                  onChange={(e) => setContactData({ ...contactData, email: e.target.value })}
+                  onChange={(e) => handleContactChange('email', e.target.value)}
                   className="input-styled text-sm font-bold"
                   placeholder="hello@example.com"
                 />
@@ -558,7 +1013,7 @@ const Dashboard = () => {
                 <input
                   type="text"
                   value={contactData.phone}
-                  onChange={(e) => setContactData({ ...contactData, phone: e.target.value })}
+                  onChange={(e) => handleContactChange('phone', e.target.value)}
                   className="input-styled text-sm font-bold"
                   placeholder="+855 12 345 678"
                 />
@@ -568,7 +1023,7 @@ const Dashboard = () => {
                 <input
                   type="text"
                   value={contactData.address}
-                  onChange={(e) => setContactData({ ...contactData, address: e.target.value })}
+                  onChange={(e) => handleContactChange('address', e.target.value)}
                   className="input-styled text-sm font-bold"
                   placeholder="Phnom Penh, Cambodia"
                 />
@@ -578,7 +1033,7 @@ const Dashboard = () => {
                 <input
                   type="text"
                   value={contactData.instagram}
-                  onChange={(e) => setContactData({ ...contactData, instagram: e.target.value })}
+                  onChange={(e) => handleContactChange('instagram', e.target.value)}
                   className="input-styled text-sm font-bold"
                   placeholder="https://instagram.com/..."
                 />
@@ -588,7 +1043,7 @@ const Dashboard = () => {
                 <input
                   type="text"
                   value={contactData.linkedin}
-                  onChange={(e) => setContactData({ ...contactData, linkedin: e.target.value })}
+                  onChange={(e) => handleContactChange('linkedin', e.target.value)}
                   className="input-styled text-sm font-bold"
                   placeholder="https://linkedin.com/in/..."
                 />
@@ -890,6 +1345,17 @@ const Dashboard = () => {
 
 
         <div className="sidebar-footer">
+          <Link
+            to="/admin/dev"
+            className="nav-item nav-item-studio mb-3"
+            title="Open 3D Dev Studio"
+          >
+            <div className="nav-icon-box">
+              <Compass size={18} />
+            </div>
+            <span className="nav-label">3D DEV STUDIO</span>
+          </Link>
+
           <button
             onClick={() => {
               localStorage.removeItem('isAdminAuthenticated');
@@ -917,6 +1383,15 @@ const Dashboard = () => {
           </div>
 
           <div className="header-actions">
+            <Link
+              to="/admin/dev"
+              className="btn-studio"
+              title="Launch 3D Dev Studio"
+            >
+              <Compass size={16} />
+              <span>3D STUDIO</span>
+            </Link>
+
             <div className="action-btn btn-bell group">
               <Bell size={18} />
               <span className="notification-dot"></span>
@@ -946,6 +1421,152 @@ const Dashboard = () => {
 
         {/* ADD PROJECT MODAL */}
         {showAddProjectModal && renderAddProjectModal()}
+
+        {/* INTERACTIVE IMAGE CROP & COMPRESS MODAL */}
+        <ImageCropModal
+          isOpen={cropModal.isOpen}
+          imageSrc={cropModal.imageSrc}
+          originalFileName={cropModal.fileName}
+          originalFileSize={cropModal.fileSize}
+          onClose={() => {
+            if (cropModal.imageSrc && cropModal.imageSrc.startsWith('blob:')) {
+              URL.revokeObjectURL(cropModal.imageSrc);
+            }
+            setCropModal((prev) => ({ ...prev, isOpen: false, imageSrc: '' }));
+          }}
+          onUploadSuccess={handleCropUploadSuccess}
+          defaultAspectRatio={cropModal.target === 'gallery' ? '1:1' : '16:9'}
+          title={cropModal.target === 'gallery' ? 'Crop & Compress Gallery Image' : 'Crop & Compress Project Image'}
+        />
+
+        {/* THUMBNAIL OPTIONS DIALOG (PREVIEW OR CHANGE) */}
+        {thumbActionModal.isOpen && (
+          <div
+            className="thumb-choice-overlay"
+            onClick={() => setThumbActionModal((prev) => ({ ...prev, isOpen: false }))}
+          >
+            <div
+              className="thumb-choice-dialog"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+            >
+              <div className="thumb-choice-header">
+                <div>
+                  <h3 className="thumb-choice-title">Thumbnail Options</h3>
+                  <p className="thumb-choice-subtitle">{thumbActionModal.title}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setThumbActionModal((prev) => ({ ...prev, isOpen: false }))}
+                  className="crop-close-btn"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="thumb-choice-body">
+                {/* Option 1: Preview Full Image */}
+                <button
+                  type="button"
+                  className="thumb-option-card group"
+                  onClick={handleTriggerPreviewFromAction}
+                >
+                  <div className="thumb-option-icon">
+                    <Eye size={20} />
+                  </div>
+                  <div className="thumb-option-info">
+                    <span className="thumb-option-name">Preview Full Image</span>
+                    <span className="thumb-option-desc">View high-resolution photo in full-screen lightbox</span>
+                  </div>
+                </button>
+
+                {/* Option 2: Change / Crop Image */}
+                <button
+                  type="button"
+                  className="thumb-option-card group"
+                  onClick={handleTriggerChangeFromAction}
+                >
+                  <div className="thumb-option-icon">
+                    <Crop size={20} />
+                  </div>
+                  <div className="thumb-option-info">
+                    <span className="thumb-option-name">Change Image</span>
+                    <span className="thumb-option-desc">Upload a new photo with interactive crop & compression</span>
+                  </div>
+                </button>
+              </div>
+
+              <div className="thumb-choice-footer">
+                <button
+                  type="button"
+                  onClick={() => setThumbActionModal((prev) => ({ ...prev, isOpen: false }))}
+                  className="thumb-choice-btn-close"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* FULLSCREEN LIGHTBOX PREVIEW */}
+        {previewLightbox.isOpen && (
+          <div
+            className="lightbox-overlay"
+            onClick={() => setPreviewLightbox((prev) => ({ ...prev, isOpen: false }))}
+          >
+            <div className="lightbox-header" onClick={(e) => e.stopPropagation()}>
+              <div className="lightbox-title-wrap">
+                <span className="lightbox-badge">FULL RESOLUTION PREVIEW</span>
+                <span className="lightbox-title">{previewLightbox.title}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreviewLightbox((prev) => ({ ...prev, isOpen: false }))}
+                className="lightbox-close-btn"
+                title="Close (Esc)"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="lightbox-image-wrap" onClick={(e) => e.stopPropagation()}>
+              <img
+                src={previewLightbox.imageSrc}
+                alt={previewLightbox.title}
+                className="lightbox-img"
+              />
+            </div>
+
+            <div className="lightbox-footer" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                className="lightbox-action-btn"
+                onClick={() => {
+                  const target = previewLightbox.target;
+                  setPreviewLightbox((prev) => ({ ...prev, isOpen: false }));
+                  if (target === 'hero') {
+                    detailFileInputRef.current?.click();
+                  } else {
+                    galleryAssetFileInputRef.current?.click();
+                  }
+                }}
+              >
+                <Crop size={15} />
+                <span>Change Image</span>
+              </button>
+              <a
+                href={previewLightbox.imageSrc}
+                target="_blank"
+                rel="noreferrer"
+                className="lightbox-action-btn"
+              >
+                <ExternalLink size={15} />
+                <span>Open Original File</span>
+              </a>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

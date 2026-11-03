@@ -54,19 +54,35 @@ const ProjectDetail = () => {
 
             <main className="detail-content">
                 <div className="detail-hero">
-                    {project.img && (project.img.startsWith('http') || project.img.startsWith('data:')) ? (
+                    {project.img ? (
                         <motion.img
                             src={project.img}
                             alt={project.title}
                             initial={{ scale: 1.1, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ duration: 0.8, ease: "easeOut" }}
+                            onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                if (e.currentTarget.nextElementSibling) {
+                                    e.currentTarget.nextElementSibling.style.display = 'flex';
+                                }
+                            }}
                         />
-                    ) : (
-                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '8rem', fontWeight: 'bold', opacity: 0.1 }}>
-                            {project.title?.[0] ?? '?'}
-                        </div>
-                    )}
+                    ) : null}
+                    <div
+                        style={{
+                            display: project.img ? 'none' : 'flex',
+                            width: '100%',
+                            height: '100%',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '8rem',
+                            fontWeight: 'bold',
+                            opacity: 0.1
+                        }}
+                    >
+                        {project.title?.[0] ?? '?'}
+                    </div>
                 </div>
 
                 <div className="detail-info">

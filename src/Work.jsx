@@ -49,8 +49,8 @@ const Work = () => {
                                 </span>
                                 <span className="arrow"><ArrowUpRight size={40} strokeWidth={1.5} /></span>
                             </Link>
-                            {project.img && (project.img.startsWith('http') || project.img.startsWith('data:')) && (
-                                <img src={project.img} className="thumbnail" alt={`${project.client} project`} loading="lazy" decoding="async" />
+                            {project.img && (
+                                <img src={project.img} className="thumbnail" alt={`${project.client} project`} loading="lazy" decoding="async" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                             )}
                         </li>
                     ))

@@ -31,6 +31,7 @@ import {
   Compass,
   ExternalLink,
   Crop,
+  RefreshCw,
   Eye,
   Maximize2
 } from 'lucide-react';
@@ -90,6 +91,24 @@ const Dashboard = () => {
   useEffect(() => {
     document.documentElement.classList.add('dark');
   }, []);
+
+  // Keep selectedWork in sync whenever workProjects changes (e.g. after upload, delete, edit)
+  useEffect(() => {
+    if (selectedWork) {
+      const fresh = workProjects.find(p => p.id === selectedWork.id);
+      if (fresh) {
+        if (
+          fresh.thumbnail !== selectedWork.thumbnail ||
+          fresh.img !== selectedWork.img ||
+          JSON.stringify(fresh.images) !== JSON.stringify(selectedWork.images) ||
+          fresh.title !== selectedWork.title ||
+          fresh.description !== selectedWork.description
+        ) {
+          setSelectedWork(fresh);
+        }
+      }
+    }
+  }, [workProjects, selectedWork]);
 
   const navItems = [
     { label: 'Home', icon: Home },
@@ -365,6 +384,75 @@ const Dashboard = () => {
     });
   };
 
+  const handleDeleteGalleryAsset = async (assetIndex) => {
+    if (!selectedWork) return;
+    if (!window.confirm('Are you sure you want to delete this image from the gallery?')) return;
+
+    const currentImages = (Array.isArray(selectedWork.images) && selectedWork.images.length > 0
+      ? [...selectedWork.images]
+      : Array.isArray(selectedWork.gallery) ? [...selectedWork.gallery] : []
+    ).filter(Boolean);
+
+    const updatedImages = currentImages.filter((_, idx) => idx !== assetIndex);
+    const updatedWork = { ...selectedWork, images: updatedImages, gallery: updatedImages };
+
+    setSelectedWork(updatedWork);
+    setWorkProjects((prev) =>
+      prev.map((p) => (p.id === selectedWork.id ? { ...p, ...updatedWork } : p))
+    );
+
+    try {
+      await updateProject(selectedWork.id, updatedWork);
+      await loadData();
+    } catch (err) {
+      console.error('Failed to delete gallery asset:', err);
+      alert('Failed to delete image asset from database.');
+    }
+  };
+
+  const handleDeleteCoverImage = async () => {
+    if (!selectedWork) return;
+    if (!window.confirm("Are you sure you want to remove this project's cover image?")) return;
+
+    const updatedWork = { ...selectedWork, thumbnail: '', img: '' };
+
+    setSelectedWork(updatedWork);
+    setWorkProjects((prev) =>
+      prev.map((p) => (p.id === selectedWork.id ? { ...p, thumbnail: '', img: '' } : p))
+    );
+
+    try {
+      await updateProject(selectedWork.id, updatedWork);
+      await loadData();
+    } catch (err) {
+      console.error('Failed to remove cover image:', err);
+      alert('Failed to remove cover image.');
+    }
+  };
+
+  const handleTriggerDeleteFromAction = () => {
+    const target = thumbActionModal.target;
+    const assetIdx = activeGalleryAssetIndex;
+    setThumbActionModal((prev) => ({ ...prev, isOpen: false }));
+    if (target === 'hero') {
+      handleDeleteCoverImage();
+    } else if (target?.startsWith('detail-gallery-')) {
+      const idx = parseInt(target.replace('detail-gallery-', ''), 10);
+      handleDeleteGalleryAsset(Number.isInteger(idx) ? idx : assetIdx);
+    }
+  };
+
+  const handleDeleteFromLightbox = () => {
+    const target = previewLightbox.target;
+    setPreviewLightbox((prev) => ({ ...prev, isOpen: false }));
+    if (target === 'hero') {
+      handleDeleteCoverImage();
+    } else if (target?.startsWith('detail-gallery-')) {
+      const idx = parseInt(target.replace('detail-gallery-', ''), 10);
+      handleDeleteGalleryAsset(Number.isInteger(idx) ? idx : activeGalleryAssetIndex);
+    }
+  };
+
   const handleCropUploadSuccess = ({ url }) => {
     if (cropModal.target === 'gallery') {
       const newImages = [url, ...images];
@@ -377,22 +465,36 @@ const Dashboard = () => {
         imageInputRef.current.value = '';
       }
     } else if (cropModal.target === 'project-main') {
-      setNewProject((prev) => ({ ...prev, thumbnail: url }));
+      setNewProject((prev) => ({ ...prev, thumbnail: url, img: url }));
     } else if (cropModal.target === 'detail-hero') {
       if (selectedWork) {
         const updatedWork = { ...selectedWork, thumbnail: url, img: url };
         setSelectedWork(updatedWork);
+        setWorkProjects((prev) =>
+          prev.map((p) => (p.id === selectedWork.id ? { ...p, thumbnail: url, img: url } : p))
+        );
         updateProject(selectedWork.id, updatedWork)
           .then(() => loadData())
           .catch((err) => console.error("Failed to update project cover:", err));
       }
     } else if (cropModal.target?.startsWith('detail-gallery-')) {
       const idx = parseInt(cropModal.target.replace('detail-gallery-', ''), 10);
-      if (selectedWork && Array.isArray(selectedWork.images)) {
-        const updatedImages = [...selectedWork.images];
-        updatedImages[idx] = url;
-        const updatedWork = { ...selectedWork, images: updatedImages };
+      if (selectedWork) {
+        const currentImages = (Array.isArray(selectedWork.images) && selectedWork.images.length > 0
+          ? [...selectedWork.images]
+          : Array.isArray(selectedWork.gallery) ? [...selectedWork.gallery] : []
+        ).filter(Boolean);
+        const updatedImages = [...currentImages];
+        if (idx < updatedImages.length) {
+          updatedImages[idx] = url;
+        } else {
+          updatedImages.push(url);
+        }
+        const updatedWork = { ...selectedWork, images: updatedImages, gallery: updatedImages };
         setSelectedWork(updatedWork);
+        setWorkProjects((prev) =>
+          prev.map((p) => (p.id === selectedWork.id ? { ...p, ...updatedWork } : p))
+        );
         updateProject(selectedWork.id, updatedWork)
           .then(() => loadData())
           .catch((err) => console.error("Failed to update project gallery image:", err));
@@ -510,25 +612,37 @@ const Dashboard = () => {
           <button onClick={() => setActivePage('Work')} className="link-view-all">VIEW ALL <ArrowRight size={14} /></button>
         </div>
         <div className="projects-grid">
-          {workProjects.slice(0, 4).map((p) => (
-            <div key={p.id} className="project-thumb-item group" onClick={() => { setSelectedWork(p); setActivePage('Work'); }}>
-              <div
-                className="project-thumb-box"
-                style={{
-                  backgroundImage: p.thumbnail ? `url(${p.thumbnail})` : 'none',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  opacity: 1
-                }}
-              >
-                {!p.thumbnail && <span className="opacity-40">{p.title || 'Project'}</span>}
+          {workProjects.slice(0, 4).map((p) => {
+            const thumbUrl = p.thumbnail || p.img;
+            return (
+              <div key={p.id} className="project-thumb-item group" onClick={() => { setSelectedWork(p); setActivePage('Work'); }}>
+                <div className="project-thumb-box">
+                  {thumbUrl ? (
+                    <img
+                      src={thumbUrl}
+                      alt={p.title}
+                      className="project-thumb-img"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const fallback = e.currentTarget.parentElement?.querySelector('.project-thumb-fallback');
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className="project-thumb-fallback"
+                    style={{ display: thumbUrl ? 'none' : 'flex' }}
+                  >
+                    <span>{p.title || 'Project'}</span>
+                  </div>
+                </div>
+                <div>
+                  <div className="card-subtitle mb-1">{p.category}</div>
+                  <h4 className="font-bold dark:text-white mb-1">{p.title}</h4>
+                </div>
               </div>
-              <div>
-                <div className="card-subtitle mb-1">{p.category}</div>
-                <h4 className="font-bold dark:text-white mb-1">{p.title}</h4>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
@@ -644,28 +758,42 @@ const Dashboard = () => {
           <div className="card-subtitle">/ Selected Projects</div>
         </div>
         <div className="work-gallery-grid">
-          {workProjects.map((project) => (
-            <div key={project.id} onClick={() => setSelectedWork(project)} className="group cursor-pointer">
-              <div className="project-card-media">
-                <div className="absolute inset-0 flex items-center justify-center text-8xl font-bold opacity-20 transition-transform duration-700 group-hover:scale-110">
-                  {project.thumbnail && (project.thumbnail.startsWith('http') || project.thumbnail.startsWith('data:')) ? (
-                    <img src={project.thumbnail} alt={project.title} className="project-img" />
-                  ) : (
-                    project.thumbnail
-                  )}
-                </div>
-                <div className="project-hover-overlay">
-                  <div className="badge-case-study">
-                    View Case Study <ArrowRight size={14} />
+          {workProjects.map((project) => {
+            const thumbUrl = project.thumbnail || project.img;
+            return (
+              <div key={project.id} onClick={() => setSelectedWork(project)} className="group cursor-pointer">
+                <div className="project-card-media">
+                  {thumbUrl ? (
+                    <img
+                      src={thumbUrl}
+                      alt={project.title}
+                      className="project-img"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                        const fallback = e.currentTarget.parentElement?.querySelector('.project-watermark-fallback');
+                        if (fallback) fallback.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    className="project-watermark-fallback"
+                    style={{ display: thumbUrl ? 'none' : 'flex' }}
+                  >
+                    <span className="project-fallback-text">{project.title}</span>
+                  </div>
+                  <div className="project-hover-overlay">
+                    <div className="badge-case-study">
+                      View Case Study <ArrowRight size={14} />
+                    </div>
                   </div>
                 </div>
+                <div className="px-2">
+                  <div className="card-subtitle mb-1">{project.category}</div>
+                  <h3 className="text-2xl font-bold dark:text-white uppercase">{project.title}</h3>
+                </div>
               </div>
-              <div className="px-2">
-                <div className="card-subtitle mb-1">{project.category}</div>
-                <h3 className="text-2xl font-bold dark:text-white uppercase">{project.title}</h3>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     );
@@ -801,9 +929,23 @@ const Dashboard = () => {
               }}
               title="Upload new image and crop"
             >
-              <Crop size={15} />
-              <span>Change Image</span>
+              <RefreshCw size={14} />
+              <span>Change Cover</span>
             </button>
+            {selectedWork.thumbnail && (
+              <button
+                type="button"
+                className="thumb-quick-btn thumb-quick-btn-danger"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteCoverImage();
+                }}
+                title="Remove cover image"
+              >
+                <Trash2 size={14} />
+                <span>Delete</span>
+              </button>
+            )}
           </div>
 
           <input
@@ -889,14 +1031,28 @@ const Dashboard = () => {
               </div>
             </section>
 
-            {/* Project Gallery if present */}
-            {galleryImages.length > 0 && (
-              <section className="detail-card">
-                <h3 className="detail-card-title">
+            {/* Project Gallery & Assets */}
+            <section className="detail-card">
+              <div className="detail-gallery-header-row">
+                <h3 className="detail-card-title mb-0">
                   <ImageIcon size={16} />
                   <span>Gallery & Assets ({galleryImages.length})</span>
                 </h3>
+                <button
+                  type="button"
+                  className="detail-gallery-add-btn"
+                  onClick={() => {
+                    setActiveGalleryAssetIndex(galleryImages.length);
+                    galleryAssetFileInputRef.current?.click();
+                  }}
+                  title="Upload new image to gallery"
+                >
+                  <Plus size={14} />
+                  <span>Add Image</span>
+                </button>
+              </div>
 
+              {galleryImages.length > 0 ? (
                 <div className="detail-gallery-grid">
                   {galleryImages.map((img, idx) => (
                     <div
@@ -925,6 +1081,7 @@ const Dashboard = () => {
                               target: `detail-gallery-${idx}`,
                             });
                           }}
+                          title="Preview full size image"
                         >
                           <Eye size={13} />
                           <span>Preview</span>
@@ -938,16 +1095,41 @@ const Dashboard = () => {
                             setActiveGalleryAssetIndex(idx);
                             galleryAssetFileInputRef.current?.click();
                           }}
+                          title="Change this image"
                         >
-                          <Crop size={13} />
+                          <RefreshCw size={13} />
                           <span>Change</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="thumb-quick-btn thumb-quick-btn-danger"
+                          style={{ padding: '0.45rem 0.85rem', fontSize: '0.7rem' }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteGalleryAsset(idx);
+                          }}
+                          title="Delete image from gallery"
+                        >
+                          <Trash2 size={13} />
+                          <span>Delete</span>
                         </button>
                       </div>
                     </div>
                   ))}
                 </div>
-              </section>
-            )}
+              ) : (
+                <div
+                  className="py-10 border border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center gap-2 text-zinc-500 cursor-pointer hover:border-zinc-600 transition-colors"
+                  onClick={() => {
+                    setActiveGalleryAssetIndex(0);
+                    galleryAssetFileInputRef.current?.click();
+                  }}
+                >
+                  <ImageIcon size={26} className="opacity-40" />
+                  <p className="text-xs uppercase font-mono tracking-wider">No gallery assets yet • Click to add image</p>
+                </div>
+              )}
+            </section>
           </main>
         </div>
       </div>
@@ -1487,11 +1669,32 @@ const Dashboard = () => {
                   onClick={handleTriggerChangeFromAction}
                 >
                   <div className="thumb-option-icon">
-                    <Crop size={20} />
+                    <RefreshCw size={20} />
                   </div>
                   <div className="thumb-option-info">
                     <span className="thumb-option-name">Change Image</span>
                     <span className="thumb-option-desc">Upload a new photo with interactive crop & compression</span>
+                  </div>
+                </button>
+
+                {/* Option 3: Delete Image */}
+                <button
+                  type="button"
+                  className="thumb-option-card thumb-option-card-danger group"
+                  onClick={handleTriggerDeleteFromAction}
+                >
+                  <div className="thumb-option-icon thumb-option-icon-danger">
+                    <Trash2 size={20} />
+                  </div>
+                  <div className="thumb-option-info">
+                    <span className="thumb-option-name text-red-400">
+                      {thumbActionModal.target === 'hero' ? 'Remove Cover Image' : 'Delete Image'}
+                    </span>
+                    <span className="thumb-option-desc">
+                      {thumbActionModal.target === 'hero'
+                        ? "Remove this project's cover image"
+                        : 'Remove this photo permanently from the gallery'}
+                    </span>
                   </div>
                 </button>
               </div>
@@ -1552,8 +1755,16 @@ const Dashboard = () => {
                   }
                 }}
               >
-                <Crop size={15} />
+                <RefreshCw size={15} />
                 <span>Change Image</span>
+              </button>
+              <button
+                type="button"
+                className="lightbox-action-btn lightbox-action-btn-danger"
+                onClick={handleDeleteFromLightbox}
+              >
+                <Trash2 size={15} />
+                <span>Delete</span>
               </button>
               <a
                 href={previewLightbox.imageSrc}

@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import './ProjectDetail.css';
 import { useSiteData } from './SiteDataContext';
+import SiteHeader from './components/SiteHeader';
 
 const ProjectDetail = () => {
     const { projectId } = useParams();
-    const navigate = useNavigate();
     const { workProjects } = useSiteData();
 
     // Try to find by id; fall back to slug match on title
@@ -21,9 +21,13 @@ const ProjectDetail = () => {
 
     if (!project) {
         return (
-            <div className="error-container">
-                <h1>Project not found</h1>
-                <Link to="/work">Back to Work</Link>
+            <div className="fx-page detail-page">
+                <SiteHeader active="WORK" />
+                <div className="fx-container detail-missing">
+                    <p className="fx-eyebrow">404</p>
+                    <h1 className="fx-display-xl">Project not found</h1>
+                    <Link to="/work" className="fx-btn fx-btn--outline">Back to work</Link>
+                </div>
             </div>
         );
     }
@@ -39,125 +43,115 @@ const ProjectDetail = () => {
             ? project.service.split(',').map((s) => s.trim())
             : [];
 
+    const currentIndex = workProjects.findIndex((p) => String(p.id) === String(project.id));
+    const nextProject = workProjects.length > 1
+        ? workProjects[(currentIndex + 1) % workProjects.length]
+        : null;
+
     return (
         <motion.div
-            className="project-detail-container"
+            className="fx-page detail-page"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
         >
-            <header className="detail-header">
-                <div className="logo" onClick={() => navigate('/')}>KAKKHEAN</div>
-                <Link to="/work" className="back-link">CLOSE [X]</Link>
-            </header>
+            <SiteHeader active="WORK" />
 
-            <main className="detail-content">
-                <div className="detail-hero">
-                    {project.img ? (
-                        <motion.img
-                            src={project.img}
-                            alt={project.title}
-                            initial={{ scale: 1.1, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            transition={{ duration: 0.8, ease: "easeOut" }}
-                            onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                                if (e.currentTarget.nextElementSibling) {
-                                    e.currentTarget.nextElementSibling.style.display = 'flex';
-                                }
-                            }}
-                        />
-                    ) : null}
-                    <div
-                        style={{
-                            display: project.img ? 'none' : 'flex',
-                            width: '100%',
-                            height: '100%',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '8rem',
-                            fontWeight: 'bold',
-                            opacity: 0.1
-                        }}
+            {/* Full-bleed hero: photograph fills the band, title sits on the bottom edge */}
+            <section className="fx-hero detail-hero">
+                {project.img && (
+                    <img
+                        className="fx-hero-media"
+                        src={project.img}
+                        alt=""
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    />
+                )}
+                <div className="fx-container fx-hero-inner">
+                    <p className="fx-eyebrow">{project.client}</p>
+                    <motion.h1
+                        className="fx-display-mega detail-title"
+                        initial={{ y: 24, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
                     >
-                        {project.title?.[0] ?? '?'}
-                    </div>
+                        {project.title}
+                    </motion.h1>
                 </div>
+            </section>
 
-                <div className="detail-info">
-                    <div className="info-main">
-                        <motion.h1
-                            initial={{ y: 30, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.3 }}
-                        >
-                            {project.title}
-                        </motion.h1>
-                        <motion.p
-                            className="description"
-                            initial={{ y: 20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            transition={{ delay: 0.4 }}
-                        >
-                            {project.description}
-                        </motion.p>
-                    </div>
+            <section className="fx-section">
+                <div className="fx-container detail-info">
+                    <motion.p
+                        className="detail-description"
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                    >
+                        {project.description}
+                    </motion.p>
 
-                    <div className="info-sidebar">
-                        <div className="info-item">
-                            <span className="label">CLIENT</span>
-                            <span className="value">{project.client}</span>
+                    <dl className="detail-specs">
+                        <div className="detail-spec">
+                            <dt className="fx-eyebrow">Client</dt>
+                            <dd>{project.client}</dd>
                         </div>
-                        <div className="info-item">
-                            <span className="label">YEAR</span>
-                            <span className="value">{project.year}</span>
+                        <div className="detail-spec">
+                            <dt className="fx-eyebrow">Year</dt>
+                            <dd>{project.year}</dd>
                         </div>
-                        <div className="info-item">
-                            <span className="label">SERVICES</span>
-                            <div className="tags">
-                                {tags.map((tag) => (
-                                    <span key={tag} className="tag">{tag}</span>
-                                ))}
+                        {tags.length > 0 && (
+                            <div className="detail-spec">
+                                <dt className="fx-eyebrow">Services</dt>
+                                <dd className="detail-tags">
+                                    {tags.map((tag) => (
+                                        <span key={tag} className="detail-badge">{tag}</span>
+                                    ))}
+                                </dd>
                             </div>
-                        </div>
-                    </div>
+                        )}
+                    </dl>
                 </div>
+            </section>
 
-                {galleryImages.length > 0 && (
-                    <div className="detail-gallery">
+            {galleryImages.length > 0 && (
+                <section className="detail-gallery-band">
+                    <div className="fx-container detail-gallery">
                         {galleryImages.map((img, index) => (
-                            <motion.div
+                            <motion.img
                                 key={index}
-                                className="gallery-item"
-                                initial={{ y: 50, opacity: 0 }}
+                                className="detail-gallery-img"
+                                src={img}
+                                alt={`${project.title} gallery ${index + 1}`}
+                                loading="lazy"
+                                decoding="async"
+                                initial={{ y: 40, opacity: 0 }}
                                 whileInView={{ y: 0, opacity: 1 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 0.6, delay: index * 0.1 }}
-                            >
-                                <img src={img} alt={`${project.title} gallery ${index}`} loading="lazy" decoding="async" />
-                            </motion.div>
+                                transition={{ duration: 0.6, delay: (index % 2) * 0.1 }}
+                            />
                         ))}
                     </div>
-                )}
-            </main>
+                </section>
+            )}
 
-            <footer className="detail-footer">
-                <div className="next-project">
-                    <span className="label">NEXT PROJECT</span>
-                    {(() => {
-                        if (workProjects.length === 0) return null;
-                        const currentIndex = workProjects.findIndex((p) => String(p.id) === projectId);
-                        const nextIndex = (currentIndex + 1) % workProjects.length;
-                        const nextProject = workProjects[nextIndex];
-                        return (
-                            <Link to={`/work/${nextProject.id}`} className="next-link">
-                                {nextProject.title} <span className="arrow"><ArrowUpRight size={40} strokeWidth={1.5} /></span>
-                            </Link>
-                        );
-                    })()}
+            <section className="fx-cta">
+                <div className="fx-container detail-next">
+                    <p className="fx-eyebrow">Next project</p>
+                    {nextProject ? (
+                        <Link to={`/work/${nextProject.id}`} className="fx-display-lg detail-next-link">
+                            {nextProject.title}
+                            <ArrowUpRight size={36} strokeWidth={1.5} aria-hidden="true" />
+                        </Link>
+                    ) : (
+                        <Link to="/work" className="fx-display-lg detail-next-link">
+                            All projects
+                            <ArrowUpRight size={36} strokeWidth={1.5} aria-hidden="true" />
+                        </Link>
+                    )}
                 </div>
-            </footer>
+            </section>
         </motion.div>
     );
 };

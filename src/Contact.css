@@ -1,222 +1,101 @@
-/* src/Contact.css */
-.contact-page {
-  background-color: #000000;
-  color: white;
-  min-height: 96vh;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: 'Arial', sans-serif;
-  padding-top: 40px;
-  position: relative;
-  overflow-x: hidden;
-}
+/* src/Contact.css
+   Everything is scoped to .contact-* so these styles can no longer leak into the admin inputs. */
 
-/* --- HEADER --- */
-.contact-logo {
-  font-family: 'Brigends Expanded', 'Impact', sans-serif;
-  font-size: 2rem;
-  letter-spacing: -2px;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-  transform: scaleY(0.8);
-}
-
-.contact-label {
-  font-size: 0.8rem;
-  color: #666;
-  letter-spacing: 2px;
-  margin-bottom: 20px;
-  text-transform: uppercase;
-  font-weight: bold;
-}
-
-/* --- HERO TEXT --- */
-.contact-hero {
-  font-family: 'Brigends Expanded', 'Arial Black', sans-serif;
-  font-size: 3.5rem;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-  text-align: center;
-  width: 90%;
-  letter-spacing: -2px;
-}
-
-/* --- FORM --- */
-.contact-form {
-  width: 90%;
-  max-width: 900px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  margin: 0 auto 100px auto;
-  /* Centering the form block */
-}
-
-.form-row {
-  display: flex;
-  gap: 15px;
-  width: 100%;
-}
-
-/* Input Styles - Matches the Grey Boxes in Image */
-input,
-textarea {
-  background-color: #D9D9D9;
-  border: none;
-  padding: 20px;
-  font-family: 'Arial', sans-serif;
-  font-size: 0.9rem;
-  color: #333;
-  text-transform: uppercase;
-  outline: none;
-  border-radius: 0;
-  /* Sharp corners */
-  width: 100%;
-  box-sizing: border-box;
-  /* Ensures padding doesn't affect width */
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #777;
-  letter-spacing: 1px;
-}
-
-.form-input {
-  flex: 1;
-  height: 50px;
-}
-
-.form-textarea {
-  width: 100%;
-  height: 150px;
-  resize: none;
-}
-
-.submit-btn {
-  background-color: #333333;
-  color: white;
-  border: none;
-  width: 100%;
-  padding: 20px;
-  text-transform: uppercase;
-  font-weight: 900;
-  letter-spacing: 2px;
-  cursor: pointer;
-  transition: background 0.3s;
-  margin-top: 5px;
-}
-
-
-.submit-btn:hover {
-  background-color: #555;
-}
-
-/* --- FOOTER COLUMNS --- */
-.contact-footer {
-  width: 90%;
-  max-width: 1200px;
+.contact-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  font-size: 0.65rem;
-  color: #AAA;
-  margin-bottom: 100px;
-  /* Space for marquee */
-  text-transform: uppercase;
-  line-height: 1.6;
-  font-weight: bold;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--fx-xl) var(--fx-md);
+  align-items: start;
 }
 
-.footer-col h4 {
-  color: white;
-  margin-bottom: 5px;
-}
-
-/* --- MARQUEE (SCROLLING TEXT) --- */
-.marquee-wrapper {
-  position: fixed;
-  bottom: 10px;
-  /* Positioned above the menu button */
-  left: 0;
-  width: 100%;
-  background-color: white;
-  color: black;
-  padding: 8px 0;
-  overflow: hidden;
-  z-index: 10;
-  border-top: 1px solid white;
-  border-bottom: 1px solid white;
-}
-
-.marquee-content {
+.contact-lead {
+  grid-column: 1 / span 6;
   display: flex;
-  white-space: nowrap;
-  animation: scroll 20s linear infinite;
-  font-family: 'Brigends Expanded', 'Arial Black', sans-serif;
-  font-size: 0.9rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  flex-direction: column;
+  gap: var(--fx-xs);
+  position: sticky;
+  top: calc(var(--fx-nav-h) + var(--fx-lg));
 }
 
-.marquee-item {
-  margin-right: 50px;
+.contact-email {
+  overflow-wrap: anywhere;
 }
 
-@keyframes scroll {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-50%);
-  }
+.contact-meta {
+  margin: var(--fx-xs) 0 0;
+  font-size: 14px;
+  color: var(--fx-body);
 }
 
-/* --- RESPONSIVE --- */
+/* --- Form (text-input-on-dark) ------------------------------------------ */
+.contact-form {
+  grid-column: 8 / span 5;
+  display: flex;
+  flex-direction: column;
+  gap: var(--fx-sm);
+}
+
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fx-xxs);
+}
+
+.contact-input {
+  width: 100%;
+  height: 48px;
+  padding: 14px var(--fx-xs);
+  background-color: var(--fx-canvas);
+  border: 1px solid var(--fx-hairline);
+  border-radius: 4px;
+  font-family: var(--fx-font);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--fx-ink);
+  outline: none;
+}
+
+.contact-input:focus {
+  border-color: var(--fx-ink);
+}
+
+.contact-input:disabled {
+  opacity: 0.5;
+}
+
+.contact-textarea {
+  height: 160px;
+  resize: vertical;
+}
+
+.contact-submit {
+  width: 100%;
+  margin-top: var(--fx-xxs);
+}
+
+.contact-status {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.contact-status--ok {
+  color: var(--fx-success);
+}
+
+.contact-status--error {
+  color: var(--fx-warning);
+}
+
+/* --- Responsive --------------------------------------------------------- */
 @media (max-width: 1024px) {
-  .contact-hero {
-    font-size: 2.5rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .contact-hero {
-    font-size: 1.8rem;
-    letter-spacing: -1px;
+  .contact-lead {
+    grid-column: 1 / -1;
+    position: static;
   }
 
-  .form-row {
-    flex-direction: column;
-  }
-
-  .contact-footer {
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-  }
-
-  .marquee-wrapper {
-    bottom: 80px;
-  }
-
-  .contact-logo {
-    font-size: 1.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .contact-hero {
-    font-size: 1.2rem;
-  }
-
-  .contact-footer {
-    grid-template-columns: 1fr;
-  }
-
-  .contact-page {
-    padding-top: 20px;
+  .contact-form {
+    grid-column: 1 / -1;
+    max-width: 640px;
   }
 }

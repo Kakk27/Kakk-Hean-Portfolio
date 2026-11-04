@@ -1,16 +1,14 @@
 // src/Contact.jsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from "framer-motion";
 import './Contact.css';
-import './KakkTunnel.css';
 import { useSiteData } from './SiteDataContext';
 import { submitContactMessage } from './services/api';
+import SiteHeader from './components/SiteHeader';
+import SiteFooter from './components/SiteFooter';
+import { footerColumns } from './components/siteNav';
 
 const Contact = () => {
   const { contactData } = useSiteData();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [hoveredLink, setHoveredLink] = useState(null);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
@@ -22,203 +20,89 @@ const Contact = () => {
     setSubmitStatus(null);
     try {
       await submitContactMessage(formData.name, formData.email, formData.message);
-      setSubmitStatus({ success: true, message: 'MESSAGE SENT SUCCESSFULLY!' });
+      setSubmitStatus({ success: true, message: 'Message sent successfully.' });
       setFormData({ name: '', email: '', message: '' });
     } catch {
-      setSubmitStatus({ success: false, message: 'FAILED TO SEND MESSAGE. PLEASE TRY AGAIN.' });
+      setSubmitStatus({ success: false, message: 'Failed to send message. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Animation Variants
-  const menuVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.3 } },
-    exit: { opacity: 0, transition: { duration: 0.3 } }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
-
-  const unequalRectPath = "M5,10 Q50,2 95,10 Q98,30 95,50 Q50,58 5,50 Q2,30 5,10 Z";
-
-  const menuItems = ['WORK', 'CONTACT', 'ABOUT', 'HOME'];
-
   return (
-    <div className="contact-page">
+    <div className="fx-page contact-page">
+      <SiteHeader active="CONTACT" />
 
-      {/* --- PAGE CONTENT --- */}
-      <div className="contact-logo">KAKKHEAN</div>
-      <div className="contact-label">CONTACT</div>
-
-      <h1 className="contact-hero">{contactData.email.toUpperCase()}</h1>
-
-      <form className="contact-form" onSubmit={handleSubmit}>
-        <div className="form-row">
-          <input
-            type="text"
-            placeholder="NAME"
-            className="form-input"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            required
-            disabled={isSubmitting}
-          />
-          <input
-            type="email"
-            placeholder="EMAIL"
-            className="form-input"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            required
-            disabled={isSubmitting}
-          />
-        </div>
-        <textarea
-          placeholder="MESSAGE"
-          className="form-textarea"
-          value={formData.message}
-          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          required
-          disabled={isSubmitting}
-        ></textarea>
-        <button type="submit" className="submit-btn" disabled={isSubmitting}>
-          {isSubmitting ? 'SENDING...' : 'SUBMIT'}
-        </button>
-        {submitStatus && (
-          <div style={{ marginTop: '15px', color: submitStatus.success ? '#4ade80' : '#f87171', fontSize: '13px', fontWeight: 'bold', letterSpacing: '1px' }}>
-            {submitStatus.message}
+      <section className="fx-section">
+        <div className="fx-container contact-grid">
+          <div className="contact-lead">
+            <p className="fx-eyebrow">Contact</p>
+            <h1 className="fx-display-xl contact-email">{contactData.email}</h1>
+            <p className="contact-meta">
+              {contactData.address}
+              <br />
+              {contactData.phone}
+            </p>
           </div>
-        )}
-      </form>
 
-      <div className="contact-footer">
-        <div className="footer-col">
-          {contactData.address.toUpperCase()}<br /><br />
-          KAKKHEAN PORTFOLIO
-        </div>
-        <div className="footer-col">
-          <a href={contactData.twitter} target="_blank" rel="noreferrer">TWITTER</a><br />
-          <a href={contactData.instagram} target="_blank" rel="noreferrer">INSTAGRAM</a><br />
-          <a href={contactData.linkedin} target="_blank" rel="noreferrer">LINKEDIN</a>
-        </div>
-        <div className="footer-col">
-          {contactData.email.toUpperCase()}<br />
-          {contactData.phone}<br /><br />
-          SAY HELLO
-        </div>
-        <div className="footer-col">
-          CRAFTED BY<br />
-          KAKKHEAN<br /><br />
-          FOLLOW ME
-        </div>
-      </div>
+          <form className="contact-form" onSubmit={handleSubmit}>
+            <div className="contact-field">
+              <label htmlFor="contact-name" className="fx-eyebrow">Name</label>
+              <input
+                id="contact-name"
+                type="text"
+                className="contact-input"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+                disabled={isSubmitting}
+                autoComplete="name"
+              />
+            </div>
 
-      <div className="marquee-wrapper">
-        <div className="marquee-content">
-          <span className="marquee-item">CRAFTED BY KAKKHEAN PORTFOLIO</span>
-          <span className="marquee-item">CRAFTED BY KAKKHEAN PORTFOLIO</span>
-          <span className="marquee-item">CRAFTED BY KAKKHEAN PORTFOLIO</span>
-          <span className="marquee-item">CRAFTED BY KAKKHEAN PORTFOLIO</span>
-          <span className="marquee-item">CRAFTED BY KAKKHEAN PORTFOLIO</span>
-          <span className="marquee-item">CRAFTED BY KAKKHEAN PORTFOLIO</span>
-        </div>
-      </div>
+            <div className="contact-field">
+              <label htmlFor="contact-email" className="fx-eyebrow">Email</label>
+              <input
+                id="contact-email"
+                type="email"
+                className="contact-input"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+                disabled={isSubmitting}
+                autoComplete="email"
+              />
+            </div>
 
-      {/* --- MENU BUTTON --- */}
-      {!isMenuOpen && (
-        <button
-          className="nav-btn menu-trigger"
-          onClick={() => setIsMenuOpen(true)}
-          style={{ position: 'fixed', bottom: '55px', zIndex: 100 }}
-        >
-          MENU
-        </button>
-      )}
+            <div className="contact-field">
+              <label htmlFor="contact-message" className="fx-eyebrow">Message</label>
+              <textarea
+                id="contact-message"
+                className="contact-input contact-textarea"
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                required
+                disabled={isSubmitting}
+              />
+            </div>
 
-      {/* --- MENU OVERLAY --- */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            className="menu-overlay"
-            variants={menuVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
-            <motion.div className="menu-links-container" variants={containerVariants} initial="hidden" animate="visible">
-
-              {menuItems.map((item) => {
-                // On Contact Page, 'CONTACT' is the active item
-                const isActive = item === 'CONTACT';
-                const isHovered = hoveredLink === item;
-
-                let wrapperClassName = "menu-link-wrapper";
-                if (hoveredLink && !isHovered) wrapperClassName += " dimmed";
-
-                let linkClassName = "menu-link";
-                if (isActive) linkClassName += " active";
-
-                const content = (
-                  <div className={wrapperClassName}>
-                    {isActive && (
-                      <svg className="active-border-svg" viewBox="0 0 100 60" preserveAspectRatio="none">
-                        <path d={unequalRectPath} vectorEffect="non-scaling-stroke" />
-                      </svg>
-                    )}
-                    <motion.h2
-                      className={linkClassName}
-                      variants={itemVariants}
-                      onMouseEnter={() => setHoveredLink(item)}
-                      onMouseLeave={() => setHoveredLink(null)}
-                    >
-                      {item}
-                    </motion.h2>
-                  </div>
-                );
-
-                // LINKING LOGIC
-                if (item === 'HOME') {
-                  return <Link to="/" key={item} style={{ textDecoration: 'none' }}>{content}</Link>;
-                }
-
-                if (item === 'ABOUT') {
-                  return <Link to="/about" key={item} style={{ textDecoration: 'none' }}>{content}</Link>;
-                }
-
-                if (item === 'WORK') {
-                  return <Link to="/work" key={item} style={{ textDecoration: 'none' }}>{content}</Link>;
-                }
-
-                // If clicking 'CONTACT', we are already here
-                if (item === 'CONTACT') {
-                  return <div key={item}>{content}</div>;
-                }
-
-                return <div key={item}>{content}</div>;
-              })}
-
-            </motion.div>
-
-            <button
-              className="nav-btn close-trigger"
-              onClick={() => setIsMenuOpen(false)}
-              style={{ position: 'fixed', bottom: '55px', zIndex: 100 }}
-            >
-              CLOSE
+            <button type="submit" className="fx-btn fx-btn--primary contact-submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Sending...' : 'Send message'}
             </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
+            {submitStatus && (
+              <p
+                className={`contact-status ${submitStatus.success ? 'contact-status--ok' : 'contact-status--error'}`}
+                role="status"
+              >
+                {submitStatus.message}
+              </p>
+            )}
+          </form>
+        </div>
+      </section>
+
+      <SiteFooter columns={footerColumns(contactData)} />
     </div>
   );
 };

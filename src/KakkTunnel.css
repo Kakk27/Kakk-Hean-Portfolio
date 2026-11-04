@@ -302,3 +302,53 @@ strong,
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
   }
 }
+
+/* ==========================================================================
+   Ferrari treatment for the public home tunnel.
+   Scoped to .fx-home so the admin dev tunnel (which shares this file) is untouched.
+   ========================================================================== */
+.scene-container.fx-home {
+  padding-top: 0;
+  background-color: #181818;
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+}
+
+.fx-home .grid-plane {
+  background: linear-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+  background-size: 100px 100px;
+}
+
+/* display-mega: Inter 500, tight tracking, never bold */
+.fx-home .main-title {
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  font-size: clamp(32px, 8vw, 80px);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -1.6px;
+  transform: none;
+}
+
+/* nav-link tokens: 13px / 600 / uppercase / tracked */
+.fx-home .subtitle {
+  font-family: 'Inter', -apple-system, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.65px;
+  margin-top: 16px;
+  color: #969696;
+}
+
+/* feature-card-photo: sharp corners, hairline instead of shadow */
+.fx-home .product-card {
+  border-radius: 0;
+  box-shadow: none;
+  outline: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+@media (max-width: 640px) {
+  .fx-home .main-title {
+    letter-spacing: -0.64px;
+  }
+}

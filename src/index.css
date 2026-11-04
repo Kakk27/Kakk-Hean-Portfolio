@@ -5,10 +5,7 @@
   font-style: normal;
 }
 
-@font-face {
-  font-family: 'Inter';
-  src: url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-}
+/* Inter is now loaded with <link> tags in index.html (the old @font-face here pointed at a CSS URL, not a font file). */
 
 .kakkhean-logo {
   font-family: 'Brigends Expanded', 'Impact', sans-serif;
@@ -76,7 +73,7 @@ body {
   left: -100%;
   width: 300%;
   height: 300%;
-  opacity: 0.1;
+  opacity: 0.035;
   pointer-events: none;
   z-index: 5;
   /* Above content but below modals if needed, though pointer-events: none handles clicks */
@@ -85,7 +82,7 @@ body {
 }
 
 .dark .bg-grain {
-  opacity: 0.11;
+  opacity: 0.04;
 }
 
 @keyframes grain {

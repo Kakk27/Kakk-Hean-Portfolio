@@ -1,0 +1,524 @@
+/* ==========================================================================
+   Ferrari design system, applied to the public pages.
+   Everything is scoped under .fx-page so the admin / dashboard never inherit it.
+
+   Tokens come from the ferrari-design-analysis skill:
+   - near-black canvas #181818 (never pure black)
+   - Rosso Corsa #da291c used scarcely: primary CTAs and the active menu index
+   - single sans family (Inter 500 is the documented FerrariSans substitute)
+   - display weight 500, never bold; CTA + nav labels uppercase and tracked
+   - 0px corners on buttons and cards, 4px on inputs, pill only for badges
+   - 8px spacing ladder, hairlines instead of shadows
+   ========================================================================== */
+
+:root {
+  --fx-primary: #da291c;
+  --fx-primary-active: #b01e0a;
+  --fx-ink: #ffffff;
+  --fx-body: #969696;
+  --fx-muted: #666666;
+  --fx-hairline: #303030;
+  --fx-canvas: #181818;
+  --fx-elevated: #303030;
+  --fx-success: #03904a;
+  --fx-warning: #f13a2c;
+
+  --fx-xxxs: 4px;
+  --fx-xxs: 8px;
+  --fx-xs: 16px;
+  --fx-sm: 24px;
+  --fx-md: 32px;
+  --fx-lg: 48px;
+  --fx-xl: 64px;
+  --fx-xxl: 96px;
+  --fx-super: 128px;
+
+  --fx-font: 'Inter', -apple-system, system-ui, sans-serif;
+  --fx-nav-h: 64px;
+  --fx-gutter: 48px;
+  --fx-max: 1280px;
+}
+
+body:has(.fx-page) {
+  background-color: var(--fx-canvas);
+}
+
+/* --- Page shell --------------------------------------------------------- */
+.fx-page {
+  min-height: 100vh;
+  width: 100%;
+  padding-top: var(--fx-nav-h);
+  background-color: var(--fx-canvas);
+  color: var(--fx-ink);
+  font-family: var(--fx-font);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+.fx-page *,
+.fx-page *::before,
+.fx-page *::after {
+  box-sizing: border-box;
+}
+
+.fx-page :focus-visible {
+  outline: 2px solid var(--fx-ink);
+  outline-offset: 2px;
+}
+
+.fx-container {
+  width: 100%;
+  max-width: var(--fx-max);
+  margin: 0 auto;
+  padding-left: var(--fx-gutter);
+  padding-right: var(--fx-gutter);
+}
+
+.fx-section {
+  padding-top: var(--fx-xxl);
+  padding-bottom: var(--fx-xxl);
+}
+
+.fx-section--tight {
+  padding-top: var(--fx-xl);
+  padding-bottom: var(--fx-xl);
+}
+
+/* --- Type --------------------------------------------------------------- */
+.fx-eyebrow {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--fx-body);
+}
+
+.fx-display-mega,
+.fx-display-xl,
+.fx-display-lg,
+.fx-display-md {
+  margin: 0;
+  font-family: var(--fx-font);
+  font-weight: 500;
+  color: var(--fx-ink);
+}
+
+.fx-display-mega {
+  font-size: 80px;
+  line-height: 1.05;
+  letter-spacing: -1.6px;
+}
+
+.fx-display-xl {
+  font-size: 56px;
+  line-height: 1.1;
+  letter-spacing: -1.12px;
+}
+
+.fx-display-lg {
+  font-size: 36px;
+  line-height: 1.2;
+  letter-spacing: -0.36px;
+}
+
+.fx-display-md {
+  font-size: 26px;
+  line-height: 1.5;
+  letter-spacing: 0.195px;
+}
+
+/* --- Buttons: sharp, uppercase, tracked --------------------------------- */
+.fx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--fx-xxs);
+  height: 48px;
+  padding: 0 var(--fx-md);
+  border: 1px solid transparent;
+  border-radius: 0;
+  font-family: var(--fx-font);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--fx-ink);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.fx-btn--primary {
+  background-color: var(--fx-primary);
+  border-color: var(--fx-primary);
+}
+
+.fx-btn--primary:active {
+  background-color: var(--fx-primary-active);
+  border-color: var(--fx-primary-active);
+}
+
+.fx-btn--outline {
+  background-color: transparent;
+  border-color: var(--fx-ink);
+}
+
+.fx-btn--outline:active {
+  background-color: var(--fx-elevated);
+}
+
+.fx-btn--sm {
+  height: 40px;
+  padding: 0 var(--fx-sm);
+  font-size: 12px;
+  letter-spacing: 1.2px;
+}
+
+.fx-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- Top navigation (64px) ---------------------------------------------- */
+.fx-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: var(--fx-nav-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--fx-gutter);
+  background-color: var(--fx-canvas);
+  border-bottom: 1px solid var(--fx-hairline);
+}
+
+.fx-nav--clear {
+  background-color: transparent;
+  border-bottom-color: transparent;
+}
+
+.fx-nav--menu {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.fx-nav-right {
+  display: flex;
+  align-items: center;
+  gap: var(--fx-sm);
+}
+
+.fx-nav-label {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.65px;
+  text-transform: uppercase;
+  color: var(--fx-body);
+}
+
+/* The wordmark is the brand mark (the Cavallino slot), so it keeps its own face. */
+.fx-wordmark {
+  display: inline-block;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: 'Brigends Expanded', 'Impact', sans-serif;
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--fx-ink);
+  cursor: pointer;
+  transform: scaleY(0.8);
+  transform-origin: left center;
+}
+
+/* --- Menu overlay ------------------------------------------------------- */
+.fx-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--fx-canvas);
+  color: var(--fx-ink);
+  font-family: var(--fx-font);
+  overflow-y: auto;
+}
+
+.fx-menu-list {
+  list-style: none;
+  width: 100%;
+  max-width: var(--fx-max);
+  margin: auto;
+  padding: var(--fx-xl) var(--fx-gutter);
+}
+
+.fx-menu-list li {
+  border-bottom: 1px solid var(--fx-hairline);
+}
+
+.fx-menu-list li:first-child {
+  border-top: 1px solid var(--fx-hairline);
+}
+
+.fx-menu-link {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  align-items: baseline;
+  padding: var(--fx-sm) 0;
+  font-size: clamp(32px, 6vw, 56px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -1.12px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--fx-body);
+}
+
+.fx-menu-link:hover,
+.fx-menu-link[aria-current='page'] {
+  color: var(--fx-ink);
+}
+
+.fx-menu-index {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  color: var(--fx-muted);
+}
+
+/* The only red in the menu: the current page, like a race-position highlight. */
+.fx-menu-link[aria-current='page'] .fx-menu-index {
+  color: var(--fx-primary);
+}
+
+.fx-menu-arrow {
+  align-self: center;
+  opacity: 0;
+}
+
+.fx-menu-link:hover .fx-menu-arrow {
+  opacity: 1;
+}
+
+/* --- Full-bleed hero ---------------------------------------------------- */
+.fx-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: min(78vh, 760px);
+  background-color: var(--fx-elevated);
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.fx-hero > img.fx-hero-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fx-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(24, 24, 24, 0) 35%, #181818 100%);
+  pointer-events: none;
+}
+
+.fx-hero-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--fx-xs);
+  padding-bottom: var(--fx-xl);
+}
+
+/* --- Pre-footer CTA band ------------------------------------------------ */
+.fx-cta {
+  border-top: 1px solid var(--fx-hairline);
+  padding: var(--fx-xxl) 0;
+}
+
+.fx-cta-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fx-md);
+}
+
+/* --- Footer + strip ----------------------------------------------------- */
+.fx-footer {
+  border-top: 1px solid var(--fx-hairline);
+  padding: var(--fx-xl) 0 var(--fx-lg);
+  color: var(--fx-body);
+}
+
+.fx-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--fx-md);
+}
+
+.fx-footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--fx-xxxs);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.fx-footer-title {
+  margin: 0 0 var(--fx-xxs);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--fx-ink);
+}
+
+.fx-footer-col a {
+  color: var(--fx-body);
+  text-decoration: none;
+}
+
+.fx-footer-col a:hover {
+  color: var(--fx-ink);
+}
+
+.fx-strip {
+  overflow: hidden;
+  padding: var(--fx-xs) 0;
+  border-top: 1px solid var(--fx-hairline);
+  white-space: nowrap;
+}
+
+.fx-strip-track {
+  display: flex;
+  width: max-content;
+  gap: var(--fx-lg);
+  animation: fx-scroll 60s linear infinite;
+}
+
+.fx-strip-item {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--fx-muted);
+}
+
+@keyframes fx-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* --- Responsive --------------------------------------------------------- */
+@media (max-width: 1024px) {
+  :root {
+    --fx-gutter: 32px;
+  }
+
+  .fx-display-mega {
+    font-size: 56px;
+    letter-spacing: -1.12px;
+  }
+
+  .fx-display-xl {
+    font-size: 44px;
+  }
+
+  .fx-footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --fx-gutter: 16px;
+  }
+
+  .fx-section {
+    padding-top: var(--fx-xl);
+    padding-bottom: var(--fx-xl);
+  }
+
+  .fx-section--tight {
+    padding-top: var(--fx-lg);
+    padding-bottom: var(--fx-lg);
+  }
+
+  .fx-display-mega {
+    font-size: 32px;
+    letter-spacing: -0.64px;
+  }
+
+  .fx-display-xl {
+    font-size: 32px;
+    letter-spacing: -0.64px;
+  }
+
+  .fx-display-lg {
+    font-size: 26px;
+  }
+
+  .fx-display-md {
+    font-size: 20px;
+    line-height: 1.5;
+  }
+
+  .fx-hero {
+    min-height: 60vh;
+  }
+
+  .fx-hero-inner {
+    padding-bottom: var(--fx-lg);
+  }
+
+  .fx-cta-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .fx-footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fx-menu-link {
+    grid-template-columns: 40px 1fr auto;
+  }
+
+  .fx-wordmark {
+    font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-strip-track {
+    animation: none;
+  }
+}

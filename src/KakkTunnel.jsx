@@ -1,9 +1,9 @@
 // src/KakkTunnel.jsx
-import React, { useState, useMemo } from "react";
-import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useMemo } from "react";
+import { motion } from "framer-motion";
 import { useSiteData } from "./SiteDataContext";
 import { generateDefaultCards, getCardTransform, defaultImages } from "./utils/tunnelCards";
+import SiteHeader from "./components/SiteHeader";
 import "./KakkTunnel.css";
 
 const KakkTunnel = ({ images: propImages }) => {
@@ -14,9 +14,6 @@ const KakkTunnel = ({ images: propImages }) => {
       : (contextImages && contextImages.length > 0)
         ? contextImages
         : defaultImages;
-
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [hoveredLink, setHoveredLink] = useState(null);
 
   const cards = useMemo(() => {
     const defaults = generateDefaultCards(activeImages);
@@ -37,28 +34,9 @@ const KakkTunnel = ({ images: propImages }) => {
     };
   }, [tunnelConfig]);
 
-  const menuVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.3 } },
-    exit: { opacity: 0, transition: { duration: 0.3 } }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
-
-  const unequalRectPath = "M5,10 Q50,2 95,10 Q98,30 95,50 Q50,58 5,50 Q2,30 5,10 Z";
-
-  const menuItems = ['WORK', 'CONTACT', 'ABOUT', 'HOME'];
-
   return (
-    <div className="scene-container">
+    <div className="scene-container fx-page fx-home">
+      <SiteHeader active="HOME" transparent />
 
       {/* --- 3D SCENE --- */}
       <motion.div
@@ -87,78 +65,6 @@ const KakkTunnel = ({ images: propImages }) => {
           />
         ))}
       </motion.div>
-
-      {/* --- MENU BUTTON --- */}
-      {!isMenuOpen && (
-        <button className="nav-btn menu-trigger" onClick={() => setIsMenuOpen(true)}>MENU</button>
-      )}
-
-      {/* --- MENU OVERLAY --- */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            className="menu-overlay"
-            variants={menuVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-          >
-            <motion.div className="menu-links-container" variants={containerVariants} initial="hidden" animate="visible">
-
-              {menuItems.map((item) => {
-                const isActive = item === 'HOME';
-                const isHovered = hoveredLink === item;
-
-                let wrapperClassName = "menu-link-wrapper";
-                if (hoveredLink && !isHovered) wrapperClassName += " dimmed";
-
-                let linkClassName = "menu-link";
-                if (isActive) linkClassName += " active";
-
-                const content = (
-                  <div className={wrapperClassName}>
-                    {isActive && (
-                      <svg className="active-border-svg" viewBox="0 0 100 60" preserveAspectRatio="none">
-                        <path d={unequalRectPath} vectorEffect="non-scaling-stroke" />
-                      </svg>
-                    )}
-                    <motion.h2
-                      className={linkClassName}
-                      variants={itemVariants}
-                      onMouseEnter={() => setHoveredLink(item)}
-                      onMouseLeave={() => setHoveredLink(null)}
-                    >
-                      {item}
-                    </motion.h2>
-                  </div>
-                );
-
-                // LINKING LOGIC
-                if (item === 'CONTACT') {
-                  return <Link to="/contact" key={item} style={{ textDecoration: 'none' }}>{content}</Link>;
-                }
-
-                if (item === 'ABOUT') {
-                  return <Link to="/about" key={item} style={{ textDecoration: 'none' }}>{content}</Link>;
-                }
-
-                if (item === 'WORK') {
-                  return <Link to="/work" key={item} style={{ textDecoration: 'none' }}>{content}</Link>;
-                }
-
-                if (item === 'HOME') {
-                  return <Link to="/" key={item} style={{ textDecoration: 'none' }}>{content}</Link>;
-                }
-
-                // Default
-                return <div key={item}>{content}</div>;
-              })}
-
-            </motion.div>
-            <button className="nav-btn close-trigger" onClick={() => setIsMenuOpen(false)}>CLOSE</button>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
